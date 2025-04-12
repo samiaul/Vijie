@@ -46,7 +46,7 @@ public class Trimmed extends CharArray<NullType, IToken<Character>>{
 
     @Override
     public String toString() {
-        return "Trimmed@" + this.getIndex();
+        return "Trimmed@%d".formatted(this.getIndex());
     }
 
 }
