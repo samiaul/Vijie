@@ -27,7 +27,7 @@ public class RightTrim<V, T extends IToken<V>> extends Trim<V, T> {
      * @return a Factory instance for RightTrim
      */
     @SuppressWarnings("unchecked")
-    public static <V, T extends IToken<V>> Factory<RightTrim<V, T>> parser(T target, String blacklist) {
+    public static <V, T extends IToken<V>> Factory<RightTrim<V, T>> parser(Factory<? extends T> target, String blacklist) {
         return new Factory<>((Class<RightTrim<V, T>>) (Class<?>) RightTrim.class, target, blacklist);
     }
 
@@ -39,7 +39,7 @@ public class RightTrim<V, T extends IToken<V>> extends Trim<V, T> {
      * @param target the target parser
      * @param blacklist the characters to be trimmed from the right
      */
-    public RightTrim(ICompositeToken<?> parent, Sequence sequence, IParser<T> target, String blacklist) {
+    public RightTrim(ICompositeToken<?> parent, Sequence sequence, Factory<? extends T> target, String blacklist) {
         super(parent, sequence, target, "", blacklist);
     }
 

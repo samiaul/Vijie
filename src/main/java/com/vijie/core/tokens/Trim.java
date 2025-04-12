@@ -25,7 +25,7 @@ public class Trim<V, T extends IToken<V>> extends Chain<V, T>
      * @return a Factory instance for Trim
      */
     @SuppressWarnings("unchecked")
-    public static <V, T extends IToken<V>> Factory<Trim<V, T>> parser(IParser<T> target, String leftBlacklist, String rightBlacklist) {
+    public static <V, T extends IToken<V>> Factory<Trim<V, T>> parser(Factory<? extends T> target, String leftBlacklist, String rightBlacklist) {
         return new Factory<>((Class<Trim<V, T>>) (Class<?>) Trim.class, target, leftBlacklist, rightBlacklist);
     }
 
@@ -65,7 +65,7 @@ public class Trim<V, T extends IToken<V>> extends Chain<V, T>
      * @param leftBlacklist the characters to be trimmed from the left
      * @param rightBlacklist the characters to be trimmed from the right
      */
-    public Trim(ICompositeToken<?> parent, Sequence sequence, IParser<T> target, String leftBlacklist, String rightBlacklist) {
+    public Trim(ICompositeToken<?> parent, Sequence sequence, Factory<? extends T> target, String leftBlacklist, String rightBlacklist) {
         super(parent, sequence, Trim.constructChain(target, leftBlacklist, rightBlacklist));
         this.leftBlacklist = leftBlacklist;
         this.rightBlacklist = rightBlacklist;
