@@ -89,11 +89,11 @@ public abstract class OptionsChain<V, T extends IToken<?>> extends NodeToken<V> 
                 this.sequence.parseAndStep(this, new Optional<>(target));
             } catch (OptionalNotFound error) {
                 errors.add(error.getCause());
-            } catch (GenericParseError error) {
+            } /*catch (GenericParseError error) {
                 //if (error.isEof()) break;
                 if (this.sequence.isEof()) break;
                 throw error;
-            }
+            }*/
         }
 
         this.sequence.clearFrom();
