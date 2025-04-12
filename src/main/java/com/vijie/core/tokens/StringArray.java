@@ -3,6 +3,8 @@ package com.vijie.core.tokens;
 
 import com.vijie.core.Sequence;
 import com.vijie.core.interfaces.ICompositeToken;
+import com.vijie.core.interfaces.IParser;
+import com.vijie.core.interfaces.IToken;
 import com.vijie.core.parsers.Factory;
 
 import java.util.Arrays;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of elements in the array, extending ICompositeToken<String>
  */
-public abstract class StringArray<T extends ICompositeToken<String>> extends Array<String, T> {
+public abstract class StringArray<T extends IToken<String>> extends Array<String, T> {
 
     /**
      * Constructs a new StringArray.
@@ -27,7 +29,7 @@ public abstract class StringArray<T extends ICompositeToken<String>> extends Arr
      */
     protected StringArray(ICompositeToken<?> parent,
                        Sequence sequence,
-                       Factory<? extends T> target,
+                       IParser<? extends T> target,
                        int extentMin,
                        int extentMax) {
         super(parent, sequence, target, extentMin, extentMax);
