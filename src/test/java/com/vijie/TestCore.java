@@ -1,5 +1,6 @@
 package com.vijie;
 
+import com.vijie.core.interfaces.INodeToken;
 import org.junit.jupiter.api.Test;
 import com.vijie.core.Glyph;
 import com.vijie.core.Sequence;
@@ -42,6 +43,8 @@ public class TestCore {
         assertEquals(1, sequence[1].getIndex());
         assertEquals(2, sequence[2].getIndex());
         assertEquals(3, sequence[3].getIndex());
+
+        assertEquals("'a'@0", sequence[0].toString());
 
     }
 
@@ -142,16 +145,67 @@ public class TestCore {
     }
 
     @Test
-    void testParser() {
+    void testTokenEquality() {
 
-        assertEquals(DefinedChar.class, DefinedChar.parser("A").getType());
+        Sequence sequence = Sequence.fromString("AA");
 
+        RootParser<Character, Glyph> root = new RootParser<>("", Glyph.parser());
+
+        DefinedChar token1 = new DefinedChar(root, sequence.copy(), "A");
+        DefinedChar token2 = new DefinedChar(root, sequence.copy(1), "A");
+
+        assertEquals(token1, token2);
+    }
+
+    @Test
+    void testParent() {
+
+        Factory<DefinedChar> parser = DefinedChar.parser("A");
+
+        RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
+
+        assertDoesNotThrow(root::parse);
+
+        assertEquals(root, root.getToken().getParent());
+        assertEquals(root.getToken(), ((INodeToken<?>) root.getToken().getContent()[0]).getParent());
+    }
+
+    @Test
+    void testRoot() {
+
+        Factory<DefinedChar> parser = DefinedChar.parser("A");
+
+        RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
+
+        assertDoesNotThrow(root::parse);
+
+        assertEquals(root, root.getToken().getParent());
+        assertEquals(root, ((INodeToken<?>) root.getToken().getContent()[0]).getRoot());
+    }
+
+
+    @Test
+    void testDepth() {
+
+        Factory<DefinedChar> parser = DefinedChar.parser("A");
+
+        RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
+
+        assertEquals(0, root.getContent()[0].getDepth());
+
+        assertDoesNotThrow(root::parse);
+
+        assertEquals(0, root.getDepth());
+        assertEquals(1, root.getToken().getDepth());
+        assertEquals(2, root.getToken().getContent()[0].getDepth());
     }
 
     @Test
     void testDefinedChar() {
 
-        RootParser<Character, DefinedChar> root = new RootParser<>("A", DefinedChar.parser("A"));
+        Factory<DefinedChar> parser = DefinedChar.parser("A");
+
+        RootParser<Character, DefinedChar> root = new RootParser<>("A", parser);
 
         assertDoesNotThrow(root::parse);
 
@@ -183,7 +237,9 @@ public class TestCore {
     @Test
     void testDefinedCharWhitelist(){
 
-        RootParser<Character, DefinedChar> root = new RootParser<>(":", DefinedChar.parser("!:;"));
+        Factory<DefinedChar> parser = DefinedChar.parser("!:;");
+
+        RootParser<Character, DefinedChar> root = new RootParser<>(":", parser);
 
         assertDoesNotThrow(root::parse);
 
@@ -220,16 +276,21 @@ public class TestCore {
     }
 
     @Test
-    void testTokenEquality() {
+    void testSpecialChar() {
 
-        Sequence sequence = Sequence.fromString("AA");
+        RootParser<Character, SpecialChar> root = new RootParser<>("\\n", SpecialChar.parser("tn"));
 
-        RootParser<Character, Glyph> root = new RootParser<>("", Glyph.parser());
+        assertDoesNotThrow(root::parse);
 
-        DefinedChar token1 = new DefinedChar(root, sequence.copy(), "A");
-        DefinedChar token2 = new DefinedChar(root, sequence.copy(1), "A");
+        assertEquals("tn", root.getToken().getWhitelist());
+        assertEquals("\\n", root.getToken().getRaw());
+        assertEquals("\\n", root.getToken().getJoin());
+        assertArrayEquals(new Character[] {'\\', 'n'}, root.getToken().getValues());
+        assertEquals('\n', root.getValue());
+        assertEquals("\\n\\@0", root.getToken().toString());
 
-        assertEquals(token1, token2);
+        SpecialChar token = new SpecialChar(new DummyRoot(), Sequence.fromString("\n"), "n");
+        assertEquals("(\\?\\)@0", token.toString());
     }
 
     @Test
@@ -258,37 +319,6 @@ public class TestCore {
         RootParser<String, Numeric> root = new RootParser<>("ABC", Numeric.parser(), false);
 
         assertThrows(UndersizedArrayError.class, root::parse);
-    }
-
-    @Test
-    void testUnion() {
-
-        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
-        Factory<DummyUnion> parser1 = DummyUnion.parser(targets);
-        Factory<DefinedChar> parser2 = DefinedChar.parser("1");
-
-        RootParser<Character, DummyUnion> root1 = new RootParser<>("1", parser1);
-        RootParser<Character, DefinedChar> root2 = new RootParser<>("1", parser2);
-
-        assertDoesNotThrow(root1::parse);
-        assertDoesNotThrow(root2::parse);
-
-        assertEquals('1', root1.getToken().getValue());
-        assertEquals(root1.getToken().getToken(), root2.getToken());
-        assertEquals(targets, root1.getToken().getTargets());
-
-    }
-
-    @Test
-    void testUnionError() {
-
-        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
-        Factory<DummyUnion> parser = DummyUnion.parser(targets);
-
-        RootParser<Character, DummyUnion> root = new RootParser<>("A", parser, false);
-
-        assertThrows(MultiParseError.class, root::parse);
-
     }
 
     @Test
@@ -368,12 +398,46 @@ public class TestCore {
     }
 
     @Test
-    void TestStringLiteral() {
+    @SuppressWarnings("unchecked")
+    void testUnion() {
+
+        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
+        Factory<DummyUnion> parser1 = DummyUnion.parser(targets);
+        Factory<DefinedChar> parser2 = DefinedChar.parser("1");
+
+        RootParser<Character, DummyUnion> root1 = new RootParser<>("1", parser1);
+        RootParser<Character, DefinedChar> root2 = new RootParser<>("1", parser2);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+
+        assertEquals('1', root1.getToken().getValue());
+        assertEquals(root1.getToken().getToken(), root2.getToken());
+        assertEquals(targets, root1.getToken().getTargets());
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUnionError() {
+
+        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
+        Factory<DummyUnion> parser = DummyUnion.parser(targets);
+
+        RootParser<Character, DummyUnion> root = new RootParser<>("A", parser, false);
+
+        assertThrows(MultiParseError.class, root::parse);
+
+    }
+
+    @Test
+    void testStringLiteral() {
 
         RootParser<String, StringLiteral> root = new RootParser<>("foo", StringLiteral.parser("foo"));
 
         assertDoesNotThrow(root::parse);
 
+        assertEquals("foo", root.getToken().getRaw());
         assertEquals("foo", root.getValue());
         assertEquals("foo", root.getToken().getLiteral());
         assertEquals(3, root.getToken().getLength());
@@ -383,9 +447,22 @@ public class TestCore {
     }
 
     @Test
+    void testEmptyLiteral() {
+
+        Factory<StringLiteral> parser = StringLiteral.parser("");
+        RootParser<String, StringLiteral> root = new RootParser<>("A", parser, false);
+
+        RuntimeException error = assertThrows(RuntimeException.class, root::parse);
+
+        assertEquals(EmptyLiteralException.class, error.getCause().getClass());
+    }
+
+    @Test
     void TestStringEnum() {
 
-        RootParser<String, StringEnum> root = new RootParser<>("bar", StringEnum.parser("foo", "bar", "zip"));
+        Factory<DummyStringEnum> parser = DummyStringEnum.parser("foo", "bar", "zip");
+
+        RootParser<String, DummyStringEnum> root = new RootParser<>("bar", parser);
 
         assertDoesNotThrow(root::parse);
 
@@ -399,9 +476,250 @@ public class TestCore {
     @Test
     void TestStringEnumError() {
 
-        RootParser<String, StringEnum> root = new RootParser<>("zi", StringEnum.parser("foo", "bar", "zip"), false);
+        Factory<DummyStringEnum> parser = DummyStringEnum.parser("foo", "bar", "zip");
+
+        RootParser<String, DummyStringEnum> root = new RootParser<>("zi", parser, false);
 
         assertThrows(MultiParseError.class, root::parse);
+
+    }
+
+    @Test
+    void testStringArray() {
+
+        Factory<StringLiteral> target = StringLiteral.parser("ABC");
+
+        RootParser<String, StringLiteral> testRoot = new RootParser<>("ABC", target);
+        assertDoesNotThrow(testRoot::parse);
+        StringLiteral testToken = testRoot.getToken();
+
+        Factory<DummyStringArray<StringLiteral>> parser = DummyStringArray.parser(target, 1, 2);
+
+        RootParser<String, DummyStringArray<StringLiteral>> root1 = new RootParser<>("ABC", parser);
+        RootParser<String, DummyStringArray<StringLiteral>> root2 = new RootParser<>("ABCABC", parser);
+        RootParser<String, DummyStringArray<StringLiteral>> root3 = new RootParser<>("ABCABCABC", parser);
+        RootParser<String, DummyStringArray<StringLiteral>> root4 = new RootParser<>("AB", parser);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+        assertDoesNotThrow(root3::parse);
+        assertThrows(UndersizedArrayError.class, root4::parse);
+
+        assertEquals("ABC", root1.getValue());
+        assertEquals("ABCABC", root2.getValue());
+        assertEquals("ABCABC", root3.getValue());
+
+        assertEquals(1, root1.getToken().getExtentMin());
+        assertEquals(2, root1.getToken().getExtentMax());
+
+        assertArrayEquals(new StringLiteral[]{testToken}, root1.getToken().getTokens());
+        assertArrayEquals(new StringLiteral[]{testToken, testToken}, root2.getToken().getTokens());
+        assertArrayEquals(new StringLiteral[]{testToken, testToken}, root3.getToken().getTokens());
+
+    }
+
+    @Test
+    void testIllegalRange() {
+
+        Factory<DummyStringArray<Word>> parser1 = DummyStringArray.parser(Word.parser(), 0, 1);
+        Factory<DummyStringArray<Word>> parser2 = DummyStringArray.parser(Word.parser(), 2, 1);
+
+        RootParser<String, DummyStringArray<Word>> root1 = new RootParser<>("A", parser1, false);
+        RootParser<String, DummyStringArray<Word>> root2 = new RootParser<>("A", parser2, false);
+
+        RuntimeException error1 = assertThrows(RuntimeException.class, root1::parse);
+        RuntimeException error2 = assertThrows(RuntimeException.class, root2::parse);
+
+        assertEquals(IllegalExtentRangeException.class, error1.getCause().getClass());
+        assertEquals(IllegalExtentRangeException.class, error2.getCause().getClass());
+
+    }
+
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testStringChain() {
+
+        Factory<StringLiteral> target1 = StringLiteral.parser("ABC");
+        RootParser<String, StringLiteral> testRoot1 = new RootParser<>("ABC", target1);
+        assertDoesNotThrow(testRoot1::parse);
+        StringLiteral testToken1 = testRoot1.getToken();
+
+        Factory<StringLiteral> target2 = StringLiteral.parser("DEF");
+        RootParser<String, StringLiteral> testRoot2 = new RootParser<>("DEF", target2);
+        assertDoesNotThrow(testRoot2::parse);
+        StringLiteral testToken2 = testRoot2.getToken();
+
+        Factory<DummyStringChain<StringLiteral>> parser = DummyStringChain.parser(target1, target2);
+
+        RootParser<String, DummyStringChain<StringLiteral>> root1 = new RootParser<>("ABCDEF", parser);
+        RootParser<String, DummyStringChain<StringLiteral>> root2 = new RootParser<>("ABCDEFGHI", parser);
+        RootParser<String, DummyStringChain<StringLiteral>> root3 = new RootParser<>("ABC", parser);
+        RootParser<String, DummyStringChain<StringLiteral>> root4 = new RootParser<>("ABCDE", parser);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+        ParserError error1 = assertThrows(ParserError.class, root3::parse);
+        ParserError error2 = assertThrows(ParserError.class, root4::parse);
+
+        assertEquals("ABCDEF", root1.getValue());
+        assertEquals("ABCDEF", root2.getValue());
+
+        assertArrayEquals(new StringLiteral[]{testToken1, testToken2}, root1.getToken().getTokens());
+        assertArrayEquals(new StringLiteral[]{testToken1, testToken2}, root2.getToken().getTokens());
+        assertArrayEquals(new Factory[]{target1, target2}, root1.getToken().getTargets());
+
+        assertEquals(EOFParseError.class, error1.getCause().getClass());
+        assertEquals(LiteralDoesNotMatch.class, error2.getCause().getClass());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testOptionsChain() {
+
+        Factory<StringLiteral> target1 = StringLiteral.parser("ABC");
+        Factory<StringLiteral> target2 = StringLiteral.parser("DEF");
+
+        RootParser<String, StringLiteral> testRoot1 = new RootParser<>("ABC", target1);
+        RootParser<String, StringLiteral> testRoot2 = new RootParser<>("DEF", target2);
+
+        assertDoesNotThrow(testRoot1::parse);
+        assertDoesNotThrow(testRoot2::parse);
+
+        StringLiteral testToken1 = testRoot1.getToken();
+        StringLiteral testToken2 = testRoot2.getToken();
+
+        Factory<DummyOptionsChain<StringLiteral>> parser = DummyOptionsChain.parser(target1, target2);
+
+        RootParser<String, DummyOptionsChain<StringLiteral>> root1 = new RootParser<>("ABCDEF", parser);
+        RootParser<String, DummyOptionsChain<StringLiteral>> root2 = new RootParser<>("ABC", parser);
+        RootParser<String, DummyOptionsChain<StringLiteral>> root3 = new RootParser<>("DEF", parser);
+        RootParser<String, DummyOptionsChain<StringLiteral>> root4 = new RootParser<>("A", parser, false);
+        RootParser<String, DummyOptionsChain<StringLiteral>> root5 = new RootParser<>("A", parser, false);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+        assertDoesNotThrow(root3::parse);
+        assertThrows(EmptyChainError.class, root4::parse);
+
+        assertArrayEquals(new Factory[]{target1, target2}, root1.getToken().getTargets());
+
+        assertEquals("ABCDEF", root1.getValue());
+        assertEquals("ABC", root2.getValue());
+        assertEquals("DEF", root3.getValue());
+
+        assertArrayEquals(new StringLiteral[]{testToken1, testToken2}, root1.getToken().getTokens());
+        assertArrayEquals(new StringLiteral[]{testToken1}, root2.getToken().getTokens());
+        assertArrayEquals(new StringLiteral[]{testToken2}, root3.getToken().getTokens());
+
+        assertArrayEquals(new String[] {"ABC", "DEF"}, root1.getToken().getValues());
+        assertArrayEquals(new String[] {"ABC"}, root2.getToken().getValues());
+        assertArrayEquals(new String[] {"DEF"}, root3.getToken().getValues());
+    }
+
+    @Test
+    void testCast() {
+
+        Factory<DummyCast> parser = DummyCast.parser();
+
+        RootParser<Integer, DummyCast> root1 = new RootParser<>("1", parser);
+
+        assertDoesNotThrow(root1::parse);
+
+        assertEquals(1, root1.getValue());
+
+    }
+
+    @Test
+    void testTrim() {
+
+        Factory<StringLiteral> target = StringLiteral.parser("ABC");
+
+        RootParser<String, StringLiteral> testRoot = new RootParser<>("ABC", target);
+        assertDoesNotThrow(testRoot::parse);
+        StringLiteral testToken = testRoot.getToken();
+
+        Factory<Trim<String, StringLiteral>> parser = Trim.parser(target, " ", "\n");
+
+        RootParser<String, Trim<String, StringLiteral>> root1 = new RootParser<>(" ABC", parser);
+        RootParser<String, Trim<String, StringLiteral>> root2 = new RootParser<>("ABC\n", parser);
+        RootParser<String, Trim<String, StringLiteral>> root3 = new RootParser<>(" ABC\n", parser);
+        RootParser<String, Trim<String, StringLiteral>> root4 = new RootParser<>(" ABC", parser);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+        assertDoesNotThrow(root3::parse);
+        assertDoesNotThrow(root4::parse);
+
+        assertEquals(" ", root1.getToken().getLeftBlacklist());
+        assertEquals("\n", root1.getToken().getRightBlacklist());
+        assertEquals(StringLiteral.class, root1.getToken().getType());
+
+        assertEquals("ABC", root1.getValue());
+        assertEquals("ABC", root2.getValue());
+        assertEquals("ABC", root3.getValue());
+        assertEquals("ABC", root4.getValue());
+
+        assertEquals(target, root1.getToken().getTarget());
+        assertEquals(target, root2.getToken().getTarget());
+        assertEquals(target, root3.getToken().getTarget());
+        assertEquals(target, root4.getToken().getTarget());
+
+        assertEquals(testToken, root1.getToken().getToken());
+        assertEquals(testToken, root2.getToken().getToken());
+        assertEquals(testToken, root3.getToken().getToken());
+        assertEquals(testToken, root4.getToken().getToken());
+
+    }
+
+
+    @Test
+    void testLRTrim() {
+
+        Factory<StringLiteral> target = StringLiteral.parser("ABC");
+
+        Factory<LeftTrim<String, StringLiteral>> parser1 = LeftTrim.parser(target, " ");
+        Factory<RightTrim<String, StringLiteral>> parser2 = RightTrim.parser(target, " ");
+
+        RootParser<String, LeftTrim<String, StringLiteral>> root1 = new RootParser<>(" ABC", parser1);
+        RootParser<String, RightTrim<String, StringLiteral>> root2 = new RootParser<>("ABC ", parser2);
+        RootParser<String, LeftTrim<String, StringLiteral>> root3 = new RootParser<>("ABC", parser1);
+        RootParser<String, RightTrim<String, StringLiteral>> root4 = new RootParser<>("ABC", parser2);
+        RootParser<String, LeftTrim<String, StringLiteral>> root5 = new RootParser<>(" ABC ", parser1);
+        RootParser<String, RightTrim<String, StringLiteral>> root6 = new RootParser<>(" ABC ", parser2, false);
+
+        assertDoesNotThrow(root1::parse);
+        assertDoesNotThrow(root2::parse);
+        assertDoesNotThrow(root3::parse);
+        assertDoesNotThrow(root4::parse);
+        assertDoesNotThrow(root5::parse);
+        assertThrows(ParserError.class, root6::parse);
+
+    }
+
+    @Test
+    void testTrimmed() {
+
+        Factory<StringLiteral> target = StringLiteral.parser("ABC");
+
+        Factory<Trim<String, StringLiteral>> parser = Trim.parser(target, " ", "");
+
+        RootParser<String, Trim<String, StringLiteral>> root1 = new RootParser<>("  ABC", parser);
+
+        assertDoesNotThrow(root1::parse);
+        assertEquals(Trimmed.class, root1.getToken().getContent()[0].getClass());
+
+        Trimmed token = (Trimmed) root1.getToken().getContent()[0];
+        assertNull(token.getValue());
+        assertArrayEquals(new Character[]{' ', ' '}, token.getValues());
+        assertEquals("Trimmed@0", token.toString());
+
+    }
+
+    @Test
+    void testFactory() {
+
+        assertEquals(DefinedChar.class, DefinedChar.parser("A").getType());
 
     }
 
@@ -441,55 +759,6 @@ public class TestCore {
         assertEquals("1", root1.getToken().getRaw());
 
         assertThrows(OptionalNotFound.class, root2::parse);
-
-    }
-
-    @Test
-    void testCast() {
-
-        Factory<DummyCast> parser = DummyCast.parser();
-
-        RootParser<Integer, DummyCast> root1 = new RootParser<>("1", parser);
-
-        assertDoesNotThrow(root1::parse);
-
-        assertEquals(1, root1.getValue());
-
-    }
-
-    @Test
-    void testStringLiteral() {
-
-        RootParser<String, StringLiteral> root = new RootParser<>("hello1", StringLiteral.parser("hello"));
-
-        assertDoesNotThrow(root::parse);
-
-        assertEquals("hello", root.getToken().getRaw());
-        assertEquals("hello", root.getValue());
-    }
-
-    @Test
-    void testEmptyLiteral() throws BaseParseError {
-
-        Factory<StringLiteral> parser = StringLiteral.parser("");
-        RootParser<String, StringLiteral> root = new RootParser<>("A", parser);
-
-        RuntimeException error = assertThrows(RuntimeException.class, root::parse);
-
-        assertEquals(EmptyLiteralException.class, error.getCause().getClass());
-    }
-
-    @Test
-    void testSpecialChar() {
-
-        RootParser<Character, SpecialChar> root = new RootParser<>("\\n", SpecialChar.parser("tn"));
-
-        assertDoesNotThrow(root::parse);
-
-        assertEquals("\\n", root.getToken().getRaw());
-        assertEquals("\\n", root.getToken().getJoin());
-        assertArrayEquals(new Character[] {'\\', 'n'}, root.getToken().getValues());
-        assertEquals('\n', root.getValue());
 
     }
 
