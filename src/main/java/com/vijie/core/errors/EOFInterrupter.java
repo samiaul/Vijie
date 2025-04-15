@@ -5,7 +5,7 @@ import com.vijie.core.Sequence;
 /**
  * Exception thrown when an unexpected end of sequence is encountered.
  */
-public final class EOFInterrupter extends GenericInterrupter {
+public final class EOFInterrupter extends MissingTokenInterrupter {
 
     /**
      * Constructs a new EOFParseError exception with the specified sequence.
