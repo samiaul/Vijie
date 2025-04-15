@@ -15,7 +15,7 @@ public abstract class GenericInterrupter extends BaseParseError {
      * @param message the detail message
      */
     public GenericInterrupter(Sequence sequence, String message) {
-        super(sequence, message);
+        super(sequence.copy(), message);
     }
 
 }
