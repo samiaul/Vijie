@@ -16,8 +16,8 @@ This project provides a core library for handling tokens, sequences, and enumera
 ## Setup Instructions
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+   git clone https://github.com/samiaul/Vijie
+   cd ./Vijie
    ```
 2. Build the project:
    ```bash
