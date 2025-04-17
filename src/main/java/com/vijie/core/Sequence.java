@@ -213,17 +213,6 @@ public final class Sequence implements Iterable<IToken<?>> {
 
         throw new IndexOutOfRange(index);
     }
-
-    Glyph insert(int index, Character value) {
-
-        Glyph glyph = new Glyph(value, index);
-
-        this.content.add(index, glyph);
-
-        return glyph;
-
-    }
-
     /**
      * Creates a copy of the sequence with the same pointer.
      *
