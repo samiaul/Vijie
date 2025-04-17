@@ -1,6 +1,7 @@
 package com.vijie;
 
 import com.vijie.core.Root;
+import com.vijie.core.Sequence;
 import com.vijie.core.errors.BaseParseError;
 import com.vijie.core.errors.GenericParseError;
 import com.vijie.core.errors.OptionalNotFound;
@@ -12,6 +13,12 @@ public class RootParser<V, T extends IToken<V>> extends Root<V> {
 
     private final IParser<T> target;
     private final boolean logError;
+
+    public RootParser(Sequence sequence, IParser<T> target) {
+        super(sequence);
+        this.target = target;
+        this.logError = false;
+    }
 
     public RootParser(IToken<?>[] content, IParser<T> target, boolean logError) {
         super(content);
