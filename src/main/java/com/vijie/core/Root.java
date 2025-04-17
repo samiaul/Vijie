@@ -1,5 +1,6 @@
 package com.vijie.core;
 
+import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IRootToken;
 import com.vijie.core.interfaces.IToken;
 
@@ -46,5 +47,14 @@ public abstract class Root<V> extends CompositeToken<V> implements IRootToken<V>
      */
     public int getDepth() {
         return 0;
+    }
+
+    public void insert(int index, Character value) {
+
+        Glyph glyph = this.getSequence().insert(index, value);
+
+        Glyph previous = this.getSequence().getAt(index - 1);
+        Glyph next = this.getSequence().getAt(index + 1);
+
     }
 }
