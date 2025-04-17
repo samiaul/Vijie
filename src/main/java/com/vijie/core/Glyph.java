@@ -28,7 +28,7 @@ public final class Glyph extends Token<Character> implements INodeToken<Characte
     /**
      * The index of the Glyph in the text.
      */
-    private final int index;
+    private int index;
 
     /**
      * The parent composite node of the Glyph.
@@ -71,6 +71,15 @@ public final class Glyph extends Token<Character> implements INodeToken<Characte
     @Override
     public int getIndex() {
         return this.index;
+    }
+
+    /**
+     * Set the index of this token.
+     *
+     * @param index The index to set.
+     */
+    void setIndex(int index) {
+        this.index = index;
     }
 
     /**
