@@ -1,5 +1,6 @@
 package com.vijie;
 
+import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.INodeToken;
 import org.junit.jupiter.api.Test;
 import com.vijie.core.Glyph;
@@ -759,6 +760,30 @@ public class TestCore {
         assertEquals("1", root1.getToken().getRaw());
 
         assertThrows(OptionalNotFound.class, root2::parse);
+
+    }
+
+    @Test
+    void testFindFromIndex() {
+
+        Sequence sequence = Sequence.fromString("ABCDEF");
+
+        Factory<StringLiteral> literal1 = StringLiteral.parser("ABC");
+        Factory<StringLiteral> literal2 = StringLiteral.parser("DEF");
+
+        Factory<DummyStringChain<StringLiteral>> parser = DummyStringChain.parser(literal1, literal2);
+
+        RootParser<String, DummyStringChain<StringLiteral>> root = new RootParser<>(sequence.copy(), parser);
+
+        assertDoesNotThrow(root::parse);
+
+        assertSame(sequence.getContent()[0], ((ICompositeToken<?>) ((ICompositeToken<?>) root.getContent()[0]).getContent()[0]).getContent()[0]);
+        assertSame(sequence.getContent()[0], root.getSequence().getAt(0));
+
+        assertEquals("ABC", root.getSequence().getAt(0).getParent().getValue());
+        assertEquals("DEF", root.getSequence().getAt(5).getParent().getValue());
+
+
 
     }
 
