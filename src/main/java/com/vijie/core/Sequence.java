@@ -193,6 +193,27 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
+     * Gets the glyph at the specified index.
+     *
+     * @param index the index of the glyph to retrieve
+     * @return the glyph at the specified index
+     * @throws IndexOutOfRange if the end of file is reached
+     */
+    public Glyph getAt(int index) throws IndexOutOfRange {
+
+        for (IToken<?> token : this.content) {
+
+            if (index < token.getIndex() || index >= token.getIndex() + token.getLength()) continue;
+
+            if (token instanceof Glyph glyph) return glyph;
+            else if (token instanceof ICompositeToken<?> composite) return composite.getSequence().getAt(index);
+            throw new RuntimeException("Unexpected token type: " + token.getClass().getName());
+
+        }
+
+        throw new IndexOutOfRange(index);
+    }
+    /**
      * Creates a copy of the sequence with the same pointer.
      *
      * @return a copy of the sequence
