@@ -54,6 +54,35 @@ public abstract class Array<V, T extends IToken<?>> extends NodeToken<V> impleme
     }
 
     /**
+     * Constructs an Array of any length.
+     *
+     * @param parent the parent composite
+     * @param sequence the sequence to be parsed
+     * @param target the parser for the tokens
+     */
+    protected Array(ICompositeToken<?> parent,
+                    Sequence sequence,
+                    IParser<? extends T> target) throws IllegalExtentRangeException {
+        this(parent, sequence, target, 1, 0);
+
+    }
+
+    /**
+     * Constructs an Array with a specified minimum extent.
+     *
+     * @param parent the parent composite
+     * @param sequence the sequence to be parsed
+     * @param target the parser for the tokens
+     * @param extentMin the minimum number of tokens required in the array
+     */
+    protected Array(ICompositeToken<?> parent,
+                    Sequence sequence,
+                    IParser<? extends T> target,
+                    int extentMin) throws IllegalExtentRangeException {
+        this(parent, sequence, target, extentMin, 0);
+    }
+
+    /**
      * Returns the minimum extent of the array.
      *
      * @return the minimum extent of the array
