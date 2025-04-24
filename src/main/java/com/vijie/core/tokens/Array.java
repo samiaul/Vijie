@@ -147,7 +147,7 @@ public abstract class Array<V, T extends IToken<?>> extends NodeToken<V> impleme
             }
         }
 
-        if (!this.sequence.isEof()) this.sequence.clearFrom();
+        this.sequence.clearFrom();
 
         if (this.getSize() < this.extentMin) throw new UndersizedArrayError(this.sequence);
 

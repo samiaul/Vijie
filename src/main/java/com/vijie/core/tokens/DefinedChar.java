@@ -66,12 +66,9 @@ public class DefinedChar extends NodeToken<Character> {
     @Override
     public void parse() throws BaseParseError {
 
-        IToken<?> current;
-        try {
-            current = this.sequence.getCurrent();
-        } catch (EOFError e) {
-            throw new EOFParseError(this.sequence);
-        }
+        if (this.sequence.isEof()) throw new EOFParseError(this.sequence);
+
+        IToken<?> current = this.sequence.getCurrent();
 
         if (!current.matches(Glyph.class)) {
             throw new ExpectedGlyphError(sequence, current);
@@ -90,11 +87,7 @@ public class DefinedChar extends NodeToken<Character> {
 
     @Override
     public String toString() {
-        try {
-            if (this.sequence.isEof()) return "(%s)@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
-            return "(?)@%d".formatted(this.getIndex());
-        } catch (Exception e) {
-            return "DefinedChar(\"%s\")".formatted(this.getWhitelist());
-        }
+        if (this.sequence.isDone()) return "(%s)@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
+        return "(?)@%d".formatted(this.getIndex());
     }
 }

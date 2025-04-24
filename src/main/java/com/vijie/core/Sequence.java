@@ -10,6 +10,7 @@ import com.vijie.core.tokens.DefinedChar;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -24,10 +25,12 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @param input the input string to tokenize
      * @return an array of Glyphs representing the tokenized input
      */
-    public static Glyph[] tokenize(String input) {
-        return IntStream.range(0, input.length())
-                .mapToObj(i -> new Glyph(input.charAt(i), i))
-                .toArray(Glyph[]::new);
+    public static Token<?>[] tokenize(String input) {
+        return Stream.concat(
+                IntStream.range(0, input.length())
+                        .mapToObj(i -> new Glyph(input.charAt(i), i)),
+                Stream.of(new EOF(input.length()))
+        ).toArray(Token<?>[]::new);
     }
 
     /**
@@ -248,9 +251,9 @@ public final class Sequence implements Iterable<IToken<?>> {
      *
      * @return a copy of the remainder of the sequence
      */
-    public Sequence copyRemainder() throws EOFParseError {
+    public Sequence copyRemainder() throws EOFError {
 
-        if (this.isEof()) throw new EOFParseError(this);
+        if (this.isDone()) throw new EOFError(this);
 
         return new Sequence(this.getRemainder());
     }
@@ -272,11 +275,24 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
-     * Checks if the pointer is at the end of the sequence.
+     * Checks if the current token is EOF token.
      *
-     * @return true if the pointer is at the end, false otherwise
+     * @return true if the current token is EOF token, false otherwise
      */
     public boolean isEof() {
+        try {
+            return this.getCurrent().matches(EOF.class);
+        } catch (EOFError e) {
+            return true;
+        }
+    }
+
+    /**
+     * Checks if the pointer is at or after the end of the sequence.
+     *
+     * @return true if the pointer is at or after the end, false otherwise
+     */
+    public boolean isDone() {
         return this.pointer >= this.getSize();
     }
 
@@ -289,7 +305,7 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
-     * Clears the sequence from the start to the pointer.
+     * Clears the sequence from the pointer to the end.
      */
     public void clearFrom() {
         this.clearFrom(0);
@@ -335,25 +351,9 @@ public final class Sequence implements Iterable<IToken<?>> {
         this.content.add(this.pointer, token);
     }
 
-    /**
-     * Retrieves the remainder of the sequence for parsing using the specified parser.
-     * If the end of the sequence is reached, it throws an EOFParseError.
-     * If the parser is an Optional and the end of the sequence is reached, it throws an OptionalNotFound.
-     *
-     * @param parser the parser to use for retrieving the remainder
-     * @return a copy of the remainder of the sequence
-     * @throws EOFParseError if the end of the sequence is reached
-     * @throws OptionalNotFound if the parser is an Optional and the end of the sequence is reached
-     */
-    private Sequence getParsingRemainder(IParser<?> parser) throws EOFParseError, OptionalNotFound {
-        try {
-            return this.copyRemainder();
-        } catch (EOFParseError error) {
-            if (parser instanceof Optional<?> optional) {
-                throw new OptionalNotFound(this, new ParserError(this, error, parser), optional.getTarget());
-            }
-            throw error;
-        }
+    public void append(IToken<?> token) {
+        if (token.getLength() != 0) throw new RuntimeException("Token length must be 0");
+        this.content.add(token);
     }
 
     /**
@@ -367,13 +367,17 @@ public final class Sequence implements Iterable<IToken<?>> {
      */
     public <T extends IToken<?>> T find(ICompositeToken<?> parent, IParser<T> target) throws BaseParseError {
 
+        GenericParseError error;
+
         try {
-            return target.parse(parent, this.getParsingRemainder(target));
-        } catch (OptionalNotFound error) {
-            throw error;
+            return target.parse(parent, this.copyRemainder());
+        } catch (OptionalNotFound err) {
+            throw err;
         } catch (GenericParseError cause) {
-            throw new ParserError(this, cause, target);
+            error = (this.isEof())?new EOFParseError(this):cause;
         }
+
+        throw new ParserError(this, error, target);
     }
 
     /**

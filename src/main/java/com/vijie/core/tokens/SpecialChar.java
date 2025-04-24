@@ -88,7 +88,7 @@ public class SpecialChar extends Chain<Character, DefinedChar>  {
 
     @Override
     public String toString() {
-        if (this.sequence.isEof()) return "%s\\@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
+        if (this.sequence.isDone()) return "%s\\@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
         return "(\\?\\)@%d".formatted(this.getIndex());
     }
 

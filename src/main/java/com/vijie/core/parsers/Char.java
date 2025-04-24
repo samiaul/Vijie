@@ -31,13 +31,10 @@ public final class Char implements IParser<Glyph> {
     public Glyph parse(ICompositeToken<?> parent, Sequence sequence)
             throws ExpectedGlyphError, EOFParseError {
 
-        IToken<?> current;
+        if (sequence.isEof()) throw new EOFParseError(sequence);
 
-        try {
-            current = sequence.getCurrent();
-        } catch (EOFError e) {
-            throw new EOFParseError(sequence);
-        }
+        IToken<?> current = sequence.getCurrent();
+
         if (current instanceof Glyph glyph) {
             glyph.setParent(parent);
             return glyph;
