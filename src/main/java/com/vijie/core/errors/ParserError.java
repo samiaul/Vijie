@@ -96,7 +96,7 @@ public class ParserError extends GenericParseError {
      */
     @Override
     public String getTraceback(int d) {
-        String tab = '\n' + "\t".repeat(d);
+        String tab = '\n' + "\t".repeat(d + 1);
         return "%s%s".formatted(
                 super.getTraceback(d),
                 (this.getCause() != null) ? (tab + this.getCause().getTraceback(d + 1)) : "");
