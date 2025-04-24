@@ -2,6 +2,7 @@ package com.vijie.core;
 
 import com.vijie.core.interfaces.IToken;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.StreamSupport;
 
@@ -83,9 +84,20 @@ public abstract class Token<V> implements IToken<V> {
      * {@inheritDoc}
      */
     @Override
-    public boolean matches(Iterable<Class<? extends IToken<?>>> other) {
+    public boolean matches(Iterable<Class<? extends IToken<?>>> others) {
         return StreamSupport
-                .stream(other.spliterator(), false)
+                .stream(others.spliterator(), false)
+                .anyMatch(this::matches);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SafeVarargs
+    @Override
+    public final boolean matches(Class<? extends IToken<?>>... others) {
+        return StreamSupport
+                .stream(Arrays.stream(others).spliterator(), false)
                 .anyMatch(this::matches);
     }
 
