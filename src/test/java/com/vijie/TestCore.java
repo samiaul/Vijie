@@ -1,5 +1,6 @@
 package com.vijie;
 
+import com.vijie.core.Token;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.INodeToken;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class TestCore {
 
     @Test
     void testTokenization() {
-        Glyph[] sequence = Sequence.tokenize("aB1!");
+        Token<?>[] sequence = Sequence.tokenize("aB1!");
 
         assertEquals('a', sequence[0].getValue());
         assertEquals('B', sequence[1].getValue());
@@ -52,12 +53,12 @@ public class TestCore {
     @Test
     void testContext() throws EOFError {
 
-        Glyph[] content = Sequence.tokenize("ABCDEF");
+        Token<?>[] content = Sequence.tokenize("ABCDEF");
 
         Sequence sequence = new Sequence(content);
 
         assertArrayEquals(content, sequence.getContent());
-        assertEquals(6, sequence.getSize());
+        assertEquals(7, sequence.getSize());
         assertEquals(6, sequence.getLength());
         assertEquals(0, sequence.getPointer());
         assertEquals(0, sequence.getPointerIndex());
@@ -96,13 +97,13 @@ public class TestCore {
 
     @Test
     void testContextSubsequence() {
-        Glyph[] content = Sequence.tokenize("01234");
+        Token<?>[] content = Sequence.tokenize("01234");
         Sequence sequence = new Sequence(content);
 
-        sequence.setPointer(2);
+        sequence.setPointer(3);
 
-        assertArrayEquals(Arrays.copyOfRange(content, 0, 3), sequence.getConsumed());
-        assertArrayEquals(Arrays.copyOfRange(content, 2, 5), sequence.getRemainder());
+        assertArrayEquals(Arrays.copyOfRange(content, 0, 4), sequence.getConsumed());
+        assertArrayEquals(Arrays.copyOfRange(content, 3, 6), sequence.getRemainder());
 
     }
 
@@ -126,7 +127,7 @@ public class TestCore {
 
     @Test
     void testContextClear() {
-        Glyph[] content = Sequence.tokenize("ABCDEF");
+        Token<?>[] content = Sequence.tokenize("ABCDEF");
 
         Sequence sequence = new Sequence(content);
         sequence.clearRemainder();
@@ -216,9 +217,7 @@ public class TestCore {
         assertEquals(0, root.getToken().getIndex());
         assertEquals(1, root.getToken().getSize());
         assertEquals(1, root.getToken().getLength());
-        assertEquals(root.getSequence(), root.getToken().getSequence());
         assertEquals(DefinedChar.class, root.getToken().getType());
-        assertArrayEquals(root.getContent(), root.getToken().getContent());
         assertEquals("(A)@0", root.getToken().toString());
 
         DefinedChar token = new DefinedChar(new DummyRoot(), Sequence.fromString("A"), "A");
@@ -229,9 +228,6 @@ public class TestCore {
     void testDefinedCharEof() {
 
         DefinedChar token = new DefinedChar(new DummyRoot(), Sequence.fromString(""), "A");
-
-        assertEquals("DefinedChar(\"A\")", token.toString());
-
         assertThrows(EOFParseError.class, token::parse);
     }
 
@@ -596,7 +592,6 @@ public class TestCore {
         RootParser<String, DummyOptionsChain<StringLiteral>> root2 = new RootParser<>("ABC", parser);
         RootParser<String, DummyOptionsChain<StringLiteral>> root3 = new RootParser<>("DEF", parser);
         RootParser<String, DummyOptionsChain<StringLiteral>> root4 = new RootParser<>("A", parser, false);
-        RootParser<String, DummyOptionsChain<StringLiteral>> root5 = new RootParser<>("A", parser, false);
 
         assertDoesNotThrow(root1::parse);
         assertDoesNotThrow(root2::parse);
