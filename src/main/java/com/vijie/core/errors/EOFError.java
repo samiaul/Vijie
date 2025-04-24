@@ -5,7 +5,7 @@ import com.vijie.core.Sequence;
 /**
  * Represents an error that occurs when an unexpected end of a sequence is encountered.
  */
-public final class EOFError extends Exception {
+public final class EOFError extends RuntimeException {
 
     private final Sequence sequence;
 
