@@ -102,6 +102,15 @@ public interface IToken<V> {
     boolean matches(Iterable<Class<? extends IToken<?>>> others);
 
     /**
+     * Check the type of this token against a varargs list of other tokens types.
+     * This method checks if this token's type matches any of the types in the provided varargs list.
+     *
+     * @param others The varargs list of other token types to compare with.
+     * @return True if this token's type matches any type in the varargs list, false otherwise.
+     */
+    boolean matches(Class<? extends IToken<?>>... others);
+
+    /**
      * Get the tree representation of the token.
      * This method returns a string that represents the token in a tree structure.
      *
