@@ -58,7 +58,7 @@ public final class Factory<T extends ICompositeToken<?>> implements IParser<T> {
      * @return an instance of the token type
      * @throws TokenInstantiationError if an error occurs during instantiation or if no suitable constructor is found
      */
-    private T instantiateToken(ICompositeToken<?> parent, Sequence sequence) {
+    public T instantiateToken(ICompositeToken<?> parent, Sequence sequence) {
 
         try {
             return this.tokenType
