@@ -1,5 +1,6 @@
 package com.vijie.core.parsers;
 
+import com.vijie.core.CompositeToken;
 import org.apache.commons.text.StringEscapeUtils;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.vijie.core.CompositeToken.instantiate;
 import static com.vijie.core.Utils.*;
 
 /**
@@ -51,36 +53,12 @@ public final class Factory<T extends ICompositeToken<?>> implements IParser<T> {
     }
 
     /**
-     * Instantiates a token of the specified type using the provided parent and sequence.
-     *
-     * @param parent   the parent composite
-     * @param sequence the sequence to parse
-     * @return an instance of the token type
-     * @throws TokenInstantiationError if an error occurs during instantiation or if no suitable constructor is found
-     */
-    public T instantiateToken(ICompositeToken<?> parent, Sequence sequence) {
-
-        try {
-            return this.tokenType
-                    .getConstructor(prependParamType(params))
-                    .newInstance(prependParam(parent, sequence, params));
-        } catch (NoSuchMethodException |
-                 InstantiationException |
-                 IllegalAccessException error) {
-            throw new TokenInstantiationError(error, this.tokenType, this.params);
-        } catch (InvocationTargetException error) {
-            throw new RuntimeException(error.getCause());
-        }
-    }
-
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public T parse(ICompositeToken<?> parent, Sequence sequence) throws BaseParseError {
 
-        T token = instantiateToken(parent, sequence);
+        T token = CompositeToken.instantiate(this.tokenType, parent, sequence, this.params);
 
         try {
             token.parse();
