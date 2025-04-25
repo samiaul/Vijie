@@ -1,10 +1,10 @@
 package com.vijie;
 
+import com.vijie.core.Atom;
 import com.vijie.core.Token;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.INodeToken;
 import org.junit.jupiter.api.Test;
-import com.vijie.core.Glyph;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.IToken;
@@ -23,12 +23,12 @@ public class TestCore {
     @Test
     void testGlyph() {
 
-        Glyph glyph = new Glyph('a', 0);
+        Atom atom = new Atom('a', 0);
 
-        assertEquals('a', glyph.getValue());
-        assertEquals("a", glyph.getRaw());
-        assertEquals(0, glyph.getIndex());
-        assertEquals(1, glyph.getLength());
+        assertEquals('a', atom.getValue());
+        assertEquals("a", atom.getRaw());
+        assertEquals(0, atom.getIndex());
+        assertEquals(1, atom.getLength());
 
     }
 
@@ -151,7 +151,7 @@ public class TestCore {
 
         Sequence sequence = Sequence.fromString("AA");
 
-        RootParser<Character, Glyph> root = new RootParser<>("", Glyph.parser());
+        RootParser<Character, Atom> root = new RootParser<>("", Atom.parser());
 
         DefinedChar token1 = new DefinedChar(root, sequence.copy(), "A");
         DefinedChar token2 = new DefinedChar(root, sequence.copy(1), "A");
@@ -726,13 +726,13 @@ public class TestCore {
 
         assertDoesNotThrow(inner::parse);
 
-        RootParser<Character, Glyph> root1 = new RootParser<>("A", new Char());
-        RootParser<Character, Glyph> root2 = new RootParser<>(new IToken[]{inner.getToken()}, new Char(), false);
+        RootParser<Character, Atom> root1 = new RootParser<>("A", new Char());
+        RootParser<Character, Atom> root2 = new RootParser<>(new IToken[]{inner.getToken()}, new Char(), false);
 
         assertDoesNotThrow(root1::parse);
 
-        assertEquals(Glyph.class, root1.getToken().getType());
-        assertEquals(new Glyph('A', 0), root1.getToken());
+        assertEquals(Atom.class, root1.getToken().getType());
+        assertEquals(new Atom('A', 0), root1.getToken());
 
         assertThrows(ExpectedGlyphError.class, root2::parse);
 

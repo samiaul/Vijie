@@ -1,7 +1,7 @@
 package com.vijie.core.tokens;
 
 
-import com.vijie.core.Glyph;
+import com.vijie.core.Atom;
 import com.vijie.core.NodeToken;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
@@ -57,7 +57,7 @@ public class DefinedChar extends NodeToken<Character> {
      */
     @Override
     public Character getValue() {
-        return ((Glyph) this.getContent()[0]).getValue();
+        return ((Atom) this.getContent()[0]).getValue();
     }
 
     /**
@@ -70,7 +70,7 @@ public class DefinedChar extends NodeToken<Character> {
 
         IToken<?> current = this.sequence.getCurrent();
 
-        if (!current.matches(Glyph.class)) {
+        if (!current.matches(Atom.class)) {
             throw new ExpectedGlyphError(sequence, current);
         }
 
@@ -78,7 +78,7 @@ public class DefinedChar extends NodeToken<Character> {
             throw new InvalidCharError(sequence, whitelist, (Character) current.getValue());
         }
 
-        ((Glyph) current).setParent(this);
+        ((Atom) current).setParent(this);
 
         this.sequence.next();
         this.sequence.clearFrom();

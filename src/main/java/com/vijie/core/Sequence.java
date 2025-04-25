@@ -4,7 +4,6 @@ import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IParser;
 import com.vijie.core.interfaces.IToken;
-import com.vijie.core.parsers.Optional;
 import com.vijie.core.tokens.DefinedChar;
 
 import java.util.*;
@@ -28,7 +27,7 @@ public final class Sequence implements Iterable<IToken<?>> {
     public static Token<?>[] tokenize(String input) {
         return Stream.concat(
                 IntStream.range(0, input.length())
-                        .mapToObj(i -> new Glyph(input.charAt(i), i)),
+                        .mapToObj(i -> new Atom(input.charAt(i), i)),
                 Stream.of(new EOF(input.length()))
         ).toArray(Token<?>[]::new);
     }
@@ -202,13 +201,13 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return the glyph at the specified index
      * @throws IndexOutOfRange if the end of file is reached
      */
-    public Glyph getAt(int index) throws IndexOutOfRange {
+    public Atom getAt(int index) throws IndexOutOfRange {
 
         for (IToken<?> token : this.content) {
 
             if (index < token.getIndex() || index >= token.getIndex() + token.getLength()) continue;
 
-            if (token instanceof Glyph glyph) return glyph;
+            if (token instanceof Atom atom) return atom;
             else if (token instanceof ICompositeToken<?> composite) return composite.getSequence().getAt(index);
             throw new RuntimeException("Unexpected token type: " + token.getClass().getName());
 
@@ -217,13 +216,13 @@ public final class Sequence implements Iterable<IToken<?>> {
         throw new IndexOutOfRange(index);
     }
 
-    Glyph insert(int index, Character value) {
+    Atom insert(int index, Character value) {
 
-        Glyph glyph = new Glyph(value, index);
+        Atom atom = new Atom(value, index);
 
-        this.content.add(index, glyph);
+        this.content.add(index, atom);
 
-        return glyph;
+        return atom;
 
     }
 

@@ -7,12 +7,12 @@ import com.vijie.core.parsers.Char;
 import static org.apache.commons.text.StringEscapeUtils.escapeJava;
 
 /**
- * Represents a Glyph, which is a type of Token containing a single character.
+ * Represents a Atom, which is a type of Token containing a single character.
  */
-public final class Glyph extends Token<Character> implements INodeToken<Character> {
+public final class Atom extends Token<Character> implements INodeToken<Character> {
 
     /**
-     * The parser for the Glyph class.
+     * The parser for the Atom class.
      *
      * @return A new instance of the Char parser.
      */
@@ -21,21 +21,21 @@ public final class Glyph extends Token<Character> implements INodeToken<Characte
     }
 
     /**
-     * The character value of the Glyph.
+     * The character value of the Atom.
      */
     private final Character value;
 
     /**
-     * The index of the Glyph in the text.
+     * The index of the Atom in the text.
      */
     private int index;
 
     /**
-     * The parent composite node of the Glyph.
+     * The parent composite node of the Atom.
      */
     private ICompositeToken<?> parent;
 
-    public Glyph(Character value, int index) {
+    public Atom(Character value, int index) {
         this.value = value;
         this.index = index;
     }

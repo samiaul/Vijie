@@ -1,7 +1,7 @@
 package com.vijie.core.tokens;
 
 
-import com.vijie.core.Glyph;
+import com.vijie.core.Atom;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeToken;
@@ -15,7 +15,7 @@ import com.vijie.core.interfaces.ICompositeToken;
  *
  * @param <V> the type of value this literal holds
  */
-public abstract class Literal<V> extends CharArray<V, Glyph> {
+public abstract class Literal<V> extends CharArray<V, Atom> {
 
     private static int getLiteralLength(String literal) {
         if (literal.isEmpty()) {
@@ -37,7 +37,7 @@ public abstract class Literal<V> extends CharArray<V, Glyph> {
      * @param literal the literal string
      */
     protected Literal(ICompositeToken<?> parent, Sequence sequence, String literal) {
-        super(parent, sequence, Glyph.parser(), getLiteralLength(literal), literal.length());
+        super(parent, sequence, Atom.parser(), getLiteralLength(literal), literal.length());
         this.literal = literal;
     }
 
