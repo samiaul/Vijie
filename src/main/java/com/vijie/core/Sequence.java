@@ -165,6 +165,16 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
+     * Returns the index of the first character.
+     *
+     * @return the index of the first character
+     */
+    public int getStartIndex() {
+        if (this.getSize() == 0) throw new EOFError(this);
+        return this.content.getFirst().getIndex();
+    }
+
+    /**
      * Returns the index of the last character.
      *
      * @return the index of the last character
