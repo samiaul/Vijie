@@ -17,6 +17,12 @@ import java.util.List;
  */
 public class Any<T extends ICompositeToken<?>> implements IParser<T> {
 
+    @SafeVarargs
+    public static <T extends ICompositeToken<?>> Any<T> of(IParser<? extends T>... targets) {
+        return new Any<>(targets);
+    }
+
+
     /**
      * The array of parsers that this Any parser will attempt to use.
      */
