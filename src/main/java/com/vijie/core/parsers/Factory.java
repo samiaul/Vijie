@@ -8,13 +8,9 @@ import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IParser;
 import com.vijie.core.interfaces.IToken;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.vijie.core.CompositeToken.instantiate;
-import static com.vijie.core.Utils.*;
 
 /**
  * A factory class for creating tokens, holding parameters before instantiation.
