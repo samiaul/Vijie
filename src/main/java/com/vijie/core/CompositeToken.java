@@ -148,11 +148,7 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
     @Override
     public String toString() {
         if (this.sequence.isDone()) {
-            try {
-                return "%s(%s)@%d".formatted(this.getClass().getSimpleName(), this.getValue(), this.getIndex());
-            } catch (Exception _) {
-                return "%s(!)@%d".formatted(this.getClass().getSimpleName(), this.getIndex());
-            }
+            return "%s(%s)@%d".formatted(this.getClass().getSimpleName(), this.getValue(), this.getIndex());
         }
         return "%s(?)@%d".formatted(this.getClass().getSimpleName(), this.getIndex());
     }
