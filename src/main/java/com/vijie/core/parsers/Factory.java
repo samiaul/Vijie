@@ -60,7 +60,7 @@ public final class Factory<T extends ICompositeToken<?>> implements IParser<T> {
             token.parse();
         } catch (GenericInterrupter error) {
             if (!(error instanceof PendingInterrupter)) token.getSequence().clearRemainder();
-            throw new Interrupter(error, token);
+            throw new Interruption(error, token);
         }
 
         return token;
