@@ -2,6 +2,8 @@ package com.vijie.core.errors;
 
 import com.vijie.core.Sequence;
 
+import static org.apache.commons.text.StringEscapeUtils.escapeJava;
+
 /**
  * Represents an error that occurs when an invalid character is encountered during parsing.
  */
@@ -25,7 +27,7 @@ public final class InvalidCharError extends GenericParseError {
      * @param actual   the actual character found
      */
     public InvalidCharError(Sequence sequence, String expected, Character actual) {
-        super(sequence, "Expected char(s) \"%s\", found: '%s'".formatted(expected, actual));
+        super(sequence, "Expected char(s) \"%s\", found: '%s'".formatted(escapeJava(expected), escapeJava(actual.toString())));
         this.actual = actual;
         this.expected = expected;
     }
