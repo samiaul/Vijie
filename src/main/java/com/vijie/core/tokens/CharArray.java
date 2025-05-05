@@ -40,6 +40,20 @@ public abstract class CharArray<V, T extends IToken<Character>> extends Array<V,
     }
 
     /**
+     * Constructs a CharArray instance with the specified parameters.
+     *
+     * @param parent the parent composite that this CharArray belongs to
+     * @param sequence the sequence of characters to be parsed
+     * @param target the target parser responsible for parsing the tokens
+     * @throws IllegalExtentRangeException if the extent range is invalid
+     */
+    protected CharArray(ICompositeToken<?> parent,
+                        Sequence sequence,
+                        IParser<? extends T> target) throws IllegalExtentRangeException {
+        super(parent, sequence, target);
+    }
+
+    /**
      * Joins the character array values into a single string.
      *
      * @return the joined string
