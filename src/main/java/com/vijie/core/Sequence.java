@@ -205,6 +205,16 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
+     * Returns the token at the specified index.
+     *
+     * @param index the index of the token to retrieve
+     * @return the token at the specified index
+     */
+    public IToken<?> get(int index) {
+        return this.content.get(index);
+    }
+
+    /**
      * Gets the glyph at the specified index.
      *
      * @param index the index of the glyph to retrieve
