@@ -43,9 +43,10 @@ public class ParserError extends GenericParseError {
         return this.parser;
     }
 
-    public GenericParseError getSource() {
+    @SuppressWarnings("unchecked")
+    public <E extends GenericParseError> E getSource() {
         if (this.getCause() instanceof ParserError previous) return previous.getSource();
-        return this.getCause();
+        return (E) this.getCause();
     }
 
     public boolean isSource(Class<? extends GenericParseError> type) {
