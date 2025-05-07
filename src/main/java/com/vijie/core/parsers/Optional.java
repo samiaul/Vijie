@@ -31,6 +31,10 @@ public final class Optional<T extends IToken<?>> implements IParser<T> {
         this.target = target;
     }
 
+    public static <T extends IToken<?>> Optional<T> of(IParser<T> parser) {
+        return new Optional<>(parser);
+    }
+
     /**
      * Returns the target parser.
      *
