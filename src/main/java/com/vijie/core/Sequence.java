@@ -415,9 +415,9 @@ public final class Sequence implements Iterable<IToken<?>> {
 
         try {
             token = this.find(parent, target);
-        } catch (Interruption error) {
-            this.fusion(error.getToken());
-            throw error.getCause();
+        } catch (Interruption interruption) {
+            this.fusion(interruption.getToken());
+            throw interruption.getCause();
         }
 
         this.fusion(token);
