@@ -215,10 +215,10 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
-     * Gets the glyph at the specified index.
+     * Gets the Atom at the specified index.
      *
-     * @param index the index of the glyph to retrieve
-     * @return the glyph at the specified index
+     * @param index the index of the Atom to retrieve
+     * @return the Atom at the specified index
      * @throws IndexOutOfRange if the end of file is reached
      */
     public Atom getAt(int index) throws IndexOutOfRange {
