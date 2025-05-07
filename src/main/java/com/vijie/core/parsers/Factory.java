@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of Composite token that this parser handles
  */
-public final class Factory<T extends ICompositeToken<?>> implements IParser<T> {
+public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
 
     /**
      * The class type of the token that this parser handles.
      */
-    private final Class<T> tokenType;
+    protected final Class<T> tokenType;
 
     /**
      * Additional parameters for the token constructor.
      */
-    private final Object[] params;
+    protected Object[] params;
 
     /**
      * Constructs a new Factory instance.
