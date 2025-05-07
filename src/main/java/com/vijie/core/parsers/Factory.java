@@ -61,9 +61,22 @@ public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
         } catch (GenericInterrupter error) {
             if (!(error instanceof PendingInterrupter)) token.getSequence().clearRemainder();
             throw new Interruption(error, token);
+        } catch (ParserError error) {
+            throw this.onParseError(token, error);
         }
 
         return token;
+    }
+
+    /**
+     * Handles parse errors by throwing a new BaseParseError.
+     *
+     * @param token the token that caused the error
+     * @param error the original error
+     * @return a new BaseParseError
+     */
+    protected BaseParseError onParseError(T token, ParserError error) {
+        return error;
     }
 
     /**
