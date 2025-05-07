@@ -159,15 +159,16 @@ public class Utils {
         /**
          * The target class type of the token to filter.
          */
-        private final Class<T> target;
+        private final Class<? extends T>[] targets;
 
         /**
          * Constructs a new filterTokens predicate.
          *
-         * @param target the class type of the token to filter
+         * @param targets the class types of the token to filter
          */
-        public filterTokens(Class<T> target) {
-            this.target = target;
+        @SafeVarargs
+        public filterTokens(Class<? extends T>... targets) {
+            this.targets = targets;
         }
 
         /**
@@ -178,7 +179,7 @@ public class Utils {
          */
         @Override
         public boolean test(IToken<?> token) {
-            return token.matches(this.target);
+            return token.matches(this.targets);
         }
     }
 
