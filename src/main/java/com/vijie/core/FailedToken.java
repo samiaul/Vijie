@@ -7,9 +7,8 @@ import com.vijie.core.interfaces.IFailedToken;
 import com.vijie.core.interfaces.IParser;
 
 import javax.lang.model.type.NullType;
-import java.util.List;
 
-public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullType> implements ICompositeFailedToken {
+public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullType> implements IFailedToken<T> {
 
     protected final T token;
     protected final GenericInterrupter interrupter;
@@ -33,14 +32,17 @@ public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullTyp
         this.syncTarget = syncTarget;
     }
 
+    @Override
     public T getToken() {
         return token;
     }
 
+    @Override
     public GenericInterrupter getInterrupter() {
         return interrupter;
     }
 
+    @Override
     public GenericFailedTokenError getError() {
         return new FailedTokenError(this);
     }

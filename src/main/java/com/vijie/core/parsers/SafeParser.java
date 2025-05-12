@@ -40,35 +40,26 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
     @Override
     public T parse(ICompositeToken<?> parent, Sequence sequence) throws BaseParseError {
 
-        IFailedToken failedToken;
+        IGenericFailedToken failedToken;
 
         try {
             return this.target.parse(parent, sequence.copy());
         } catch (Interruption interruption) {
-            //System.out.println(this + " " + interruption);
-            failedToken = this.getFailedToken(parent, sequence, interruption);
+            //System.err.println(this + " " + interruption);
+            failedToken = this.onInterruption(parent, sequence, interruption);
         } catch (GenericInterrupter interrupter) {
-            //System.out.println(this + " " + interrupter);
-            failedToken = this.getUnknownToken(parent, sequence, interrupter);
-        }
+            //System.err.println(this + " " + interrupter);
+            failedToken = this.onInterrupter(parent, sequence, interrupter);
+        }/* catch (BaseParseError error) {
+            System.err.println(this + " " + error);
+            throw error;
+        }*/
 
         throw new FailedTokenInterruption(failedToken);
 
     }
 
-    protected IFailedToken parseFailedToken(ICompositeToken<?> parent, Sequence sequence, ICompositeFailedToken failedToken) throws BaseParseError {
-
-        try {
-            failedToken.parse();
-        } catch (EOFInterrupter _) {
-            if (this.missingInterrupter == null) throw failedToken.getInterrupter();
-            return this.getMissingToken(parent, sequence);
-        }
-
-        return failedToken;
-    }
-
-    protected IFailedToken getFailedToken(ICompositeToken<?> parent, Sequence sequence, Interruption interruption) throws BaseParseError {
+    protected IGenericFailedToken onInterruption(ICompositeToken<?> parent, Sequence sequence, Interruption interruption) throws BaseParseError {
 
         ICompositeFailedToken failedToken;
 
@@ -76,29 +67,51 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
 
         if (interrupter instanceof FatalInterrupter) throw interruption;
 
-        if (this.syncTarget == null && this.missingInterrupter == null) failedToken = getUnexpectedToken(parent, sequence, interrupter);
-        else if (this.syncTarget == null) return this.getMissingToken(parent, sequence);
-        else failedToken = new FailedToken<>(parent, sequence.copy(), interruption.getToken(), interrupter, this.syncTarget);
+        if (this.syncTarget == null && this.missingInterrupter == null) failedToken = getUnexpected(parent, sequence, interrupter);
+        else if (this.syncTarget == null) return this.getMissing(parent, sequence);
+        else failedToken = this.getFailed(parent, sequence, interruption.getToken(), interruption.getCause());
 
-        return this.parseFailedToken(parent, sequence, failedToken);
+        return this.parseToken(parent, sequence, failedToken);
     }
 
-    protected IFailedToken getUnknownToken(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) throws BaseParseError {
+    protected IGenericFailedToken onInterrupter(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) throws BaseParseError {
 
         ICompositeFailedToken failedToken;
 
-        if (syncTarget == null) failedToken = getUnexpectedToken(parent, sequence, interrupter);
-        else failedToken = new UnknownToken<>(parent, sequence.copy(), this.target, interrupter, this.syncTarget);
+        if (syncTarget == null) failedToken = getUnexpected(parent, sequence, interrupter);
+        else failedToken = this.getUnknown(parent, sequence, interrupter);
 
-        return this.parseFailedToken(parent, sequence, failedToken);
+        return this.parseToken(parent, sequence, failedToken);
     }
 
-    protected IFailedToken getMissingToken(ICompositeToken<?> parent, Sequence sequence) {
-        return new MissingToken<>(parent, sequence.getCurrentIndex(), this.target, this.instantiateInterrupter(sequence));
+    protected IGenericFailedToken parseToken(ICompositeToken<?> parent, Sequence sequence, ICompositeFailedToken failedToken) throws BaseParseError {
+
+        try {
+            failedToken.parse();
+        } catch (EOFInterrupter _) {
+            if (this.missingInterrupter == null) throw failedToken.getInterrupter();
+            return this.getMissing(parent, sequence);
+        } catch (GenericInterrupter error) {
+            throw new Interruption(failedToken.getInterrupter(), failedToken);
+        }
+
+        return failedToken;
     }
 
-    protected UnexpectedToken getUnexpectedToken(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
+    protected IFailedToken<T> getFailed(ICompositeToken<?> parent, Sequence sequence, T token, GenericInterrupter interrupter) {
+        return new FailedToken<>(parent, sequence.copy(), token, interrupter, this.syncTarget);
+    }
+
+    protected IUnknownToken<T> getUnknown(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
+        return new UnknownToken<>(parent, sequence.copy(), this.target, interrupter, this.syncTarget);
+    }
+
+    protected UnexpectedToken getUnexpected(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
         return new UnexpectedToken(parent, sequence, interrupter, this.target);
+    }
+
+    protected MissingToken<T> getMissing(ICompositeToken<?> parent, Sequence sequence) {
+        return new MissingToken<>(parent, sequence.getCurrentIndex(), this.target, this.instantiateInterrupter(sequence));
     }
 
     protected MissingTokenInterrupter instantiateInterrupter(Sequence sequence) {

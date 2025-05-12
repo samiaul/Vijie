@@ -1,20 +1,20 @@
 package com.vijie.core.errors;
 
 import com.vijie.core.Sequence;
-import com.vijie.core.interfaces.IFailedToken;
+import com.vijie.core.interfaces.IGenericFailedToken;
 
 
 public abstract class GenericFailedTokenError extends BaseParseError {
 
-    protected final IFailedToken failedToken;
+    protected final IGenericFailedToken failedToken;
 
 
-    public GenericFailedTokenError(Sequence sequence, IFailedToken failedToken) {
+    public GenericFailedTokenError(Sequence sequence, IGenericFailedToken failedToken) {
         super(sequence, failedToken.getInterrupter().getMessage(), failedToken.getInterrupter());
         this.failedToken = failedToken;
     }
 
-    public IFailedToken getFailedToken() {
+    public IGenericFailedToken getFailedToken() {
         return failedToken;
     }
 

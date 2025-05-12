@@ -1,12 +1,11 @@
 package com.vijie.core;
 
 import com.vijie.core.interfaces.ICompositeToken;
-import com.vijie.core.interfaces.IFailedToken;
+import com.vijie.core.interfaces.IGenericFailedToken;
 import com.vijie.core.interfaces.IToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -39,7 +38,7 @@ public class TokenStream<V, T extends IToken<V>> {
     public TokenStream<V, T> curate() {
         List<T> filtered = new ArrayList<>();
         for (T item : content) {
-            if (item instanceof IFailedToken) continue;
+            if (item instanceof IGenericFailedToken) continue;
             filtered.add(item);
         }
 

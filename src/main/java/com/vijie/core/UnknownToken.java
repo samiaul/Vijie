@@ -3,13 +3,12 @@ package com.vijie.core;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeFailedToken;
 import com.vijie.core.interfaces.ICompositeToken;
-import com.vijie.core.interfaces.IFailedToken;
 import com.vijie.core.interfaces.IParser;
+import com.vijie.core.interfaces.IUnknownToken;
 
 import javax.lang.model.type.NullType;
-import java.util.List;
 
-public class UnknownToken<T extends ICompositeToken<?>> extends NodeToken<NullType> implements ICompositeFailedToken {
+public class UnknownToken<T extends ICompositeToken<?>> extends NodeToken<NullType> implements IUnknownToken<T> {
 
     protected final IParser<T> target;
     protected final GenericInterrupter interrupter;

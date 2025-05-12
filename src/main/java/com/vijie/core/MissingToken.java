@@ -4,11 +4,10 @@ import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.*;
 
 import javax.lang.model.type.NullType;
-import java.util.List;
 
-public class MissingToken<T extends IToken<?>> extends Token<NullType> implements INodeToken<NullType>, IFailedToken {
+public class MissingToken<T extends IToken<?>> extends Token<NullType> implements INodeToken<NullType>, IGenericFailedToken {
 
-    protected final ICompositeToken parent;
+    protected final ICompositeToken<?> parent;
     protected final int index;
     protected final IParser<T> target;
     protected final MissingTokenInterrupter interrupter;
