@@ -1,12 +1,16 @@
 package com.vijie.core;
 
 import com.vijie.core.errors.BaseParseError;
+import com.vijie.core.errors.GenericFailedTokenError;
 import com.vijie.core.errors.TokenInstantiationError;
 import com.vijie.core.interfaces.ICompositeToken;
+import com.vijie.core.interfaces.IFailedToken;
 import com.vijie.core.interfaces.IToken;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.vijie.core.Utils.prependParam;
@@ -24,7 +28,7 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
     /**
      * Instantiates a token of the specified type using the provided parent and sequence.
      * <p>
-     * This method uses reflection to find and invoke a constructor of the specified token type.
+     * This method uses reflection to tryParse and invoke a constructor of the specified token type.
      * It prepends the parent and sequence parameters to the provided additional parameters
      * and attempts to create a new instance of the token type.
      *
@@ -124,6 +128,23 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
      * {@inheritDoc}
      */
     @Override
+    public List<GenericFailedTokenError> getErrors() {
+
+        List<GenericFailedTokenError> errors = new ArrayList<>();
+
+        for (IToken<?> token : this.getContent()) {
+            if (token instanceof ICompositeToken<?> compositeToken) errors.addAll(compositeToken.getErrors());
+            if (token instanceof IFailedToken failedToken) errors.add(failedToken.getError());
+        }
+
+        return errors;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public abstract void parse() throws BaseParseError;
 
     /**
@@ -147,9 +168,7 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
 
     @Override
     public String toString() {
-        if (this.sequence.isDone()) {
-            return "%s(%s)@%d".formatted(this.getClass().getSimpleName(), this.getValue(), this.getIndex());
-        }
-        return "%s(?)@%d".formatted(this.getClass().getSimpleName(), this.getIndex());
+        String value = (this.sequence.isDone())?this.getValue().toString():"?";
+        return "%s(%s)@%d".formatted(this.getClass().getSimpleName(), value, this.getIndex());
     }
 }

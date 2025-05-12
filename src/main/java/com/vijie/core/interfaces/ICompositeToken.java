@@ -2,6 +2,9 @@ package com.vijie.core.interfaces;
 
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.BaseParseError;
+import com.vijie.core.errors.GenericFailedTokenError;
+
+import java.util.List;
 
 /**
  * Interface representing a composite structure that extends the IToken interface.
@@ -31,6 +34,13 @@ public interface ICompositeToken<V> extends IToken<V> {
      * @return the number of sub-tokens
      */
     int getSize();
+
+    /**
+     * Gets the errors associated with the composite token.
+     *
+     * @return a list of `GenericFailedTokenError` objects representing the errors
+     */
+    List<GenericFailedTokenError> getErrors();
 
     /**
      * Parses the token.

@@ -4,11 +4,12 @@ package com.vijie.core.tokens;
 import com.vijie.core.NodeToken;
 import com.vijie.core.Sequence;
 import com.vijie.core.Utils;
-import com.vijie.core.errors.BaseParseError;
-import com.vijie.core.errors.OptionalNotFound;
+import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents a chain of specific tokens that can be parsed sequentially.
@@ -81,6 +82,7 @@ public abstract class Chain<V, T extends IToken<?>> extends NodeToken<V>
             try {
                 this.sequence.parseAndStep(this, target);
             } catch (OptionalNotFound _) {}
+
         }
 
         this.sequence.clearFrom();

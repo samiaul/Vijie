@@ -1,6 +1,8 @@
 package com.vijie.core.interfaces;
 
-import com.vijie.core.errors.GenericUnparsedError;
+import com.vijie.core.errors.GenericFailedTokenError;
+
+import java.util.List;
 
 /**
  * Represents the root token of the parser tree.
@@ -9,6 +11,6 @@ import com.vijie.core.errors.GenericUnparsedError;
  */
 public interface IRootToken<V> extends ICompositeToken<V> {
 
-    GenericUnparsedError[] getErrors();
+    List<GenericFailedTokenError> getErrors();
 
 }

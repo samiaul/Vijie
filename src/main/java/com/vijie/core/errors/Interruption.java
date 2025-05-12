@@ -19,7 +19,7 @@ public final class Interruption extends RuntimeException {
      * @param cause    The cause of the interruption, represented as a BaseParseError.
      * @param token    The token associated with this interrupter.
      */
-    public Interruption(BaseParseError cause, IToken<?> token) {
+    public Interruption(GenericInterrupter cause, IToken<?> token) {
         super(cause.getMessage(), cause);
         this.token = token;
     }
@@ -29,8 +29,8 @@ public final class Interruption extends RuntimeException {
      *
      * @return The cause of this interrupter, cast to a BaseParseError.
      */
-    public BaseParseError getCause() {
-        return (BaseParseError) super.getCause();
+    public GenericInterrupter getCause() {
+        return (GenericInterrupter) super.getCause();
     }
 
     /**

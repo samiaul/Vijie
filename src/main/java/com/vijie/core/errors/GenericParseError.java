@@ -67,11 +67,9 @@ public abstract class GenericParseError extends BaseParseError {
 
     /**
      * Checks if the error is caused by reaching the end of the file (EOF).
-     *
-     * @return {@code false} as this error is not related to EOF by default
      */
     public boolean isEof() {
-        return false;
+        return this.sequence.isEof();
     }
 
     /**

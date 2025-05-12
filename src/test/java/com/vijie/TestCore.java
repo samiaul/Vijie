@@ -51,7 +51,7 @@ public class TestCore {
     }
 
     @Test
-    void testContext() throws EOFError {
+    void testContext() throws EOFException {
 
         Token<?>[] content = Sequence.tokenize("ABCDEF");
 
@@ -74,7 +74,7 @@ public class TestCore {
     }
 
     @Test
-    void testContextMovement() throws EOFError {
+    void testContextMovement() throws EOFException {
 
         Sequence sequence = Sequence.fromString("ABC");
 

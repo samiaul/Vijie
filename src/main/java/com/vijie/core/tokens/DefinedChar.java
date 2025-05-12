@@ -88,6 +88,6 @@ public class DefinedChar extends NodeToken<Character> {
     @Override
     public String toString() {
         if (this.sequence.isDone()) return "(%s)@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
-        return "(?)@%d".formatted(this.getIndex());
+        return "(\"%s\")@%d".formatted(escapeJava(this.whitelist),this.getIndex());
     }
 }

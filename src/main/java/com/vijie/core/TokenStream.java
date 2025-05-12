@@ -1,6 +1,7 @@
 package com.vijie.core;
 
 import com.vijie.core.interfaces.ICompositeToken;
+import com.vijie.core.interfaces.IFailedToken;
 import com.vijie.core.interfaces.IToken;
 
 import java.util.ArrayList;
@@ -23,12 +24,26 @@ public class TokenStream<V, T extends IToken<V>> {
         this(Arrays.stream(content).toList());
     }
 
-    public static <T extends IToken<?>> TokenStream<?, T> of(T[] content) {
+    public static <W, T extends IToken<W>> TokenStream<W, T> of(T[] content) {
+        return new TokenStream(content);
+    }
+
+    public static <T extends IToken<?>> TokenStream<?, T> erasedOf(T[] content) {
         return new TokenStream(content);
     }
 
     public static TokenStream<?, IToken<?>> of(ICompositeToken<?> source) {
         return new TokenStream(Arrays.stream(source.getContent()).toList());
+    }
+
+    public TokenStream<V, T> curate() {
+        List<T> filtered = new ArrayList<>();
+        for (T item : content) {
+            if (item instanceof IFailedToken) continue;
+            filtered.add(item);
+        }
+
+        return new TokenStream(filtered);
     }
 
     @SuppressWarnings("unchecked")
@@ -39,7 +54,7 @@ public class TokenStream<V, T extends IToken<V>> {
                 filtered.add((K) item);
             }
         }
-        return new TokenStream<>(filtered);
+        return new TokenStream(filtered);
     }
 
     @SafeVarargs
@@ -52,11 +67,10 @@ public class TokenStream<V, T extends IToken<V>> {
         return new TokenStream(filtered);
     }
 
-    public <W> Stream<W> flatMap(Function<T, W[]> mapper) {
-        List<W> flatMapped = new ArrayList<>();
+    public <O> Stream<O> flatMap(Function<T, List<O>> mapper) {
+        List<O> flatMapped = new ArrayList<>();
         for (T item : content) {
-            Stream<W> resultStream = Arrays.stream(mapper.apply(item));
-            flatMapped.addAll(resultStream.toList());
+            flatMapped.addAll(mapper.apply(item));
         }
         return flatMapped.stream();
     }

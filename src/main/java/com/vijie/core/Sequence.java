@@ -4,6 +4,7 @@ import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IParser;
 import com.vijie.core.interfaces.IToken;
+import com.vijie.core.parsers.Char;
 import com.vijie.core.tokens.DefinedChar;
 
 import java.util.*;
@@ -140,13 +141,13 @@ public final class Sequence implements Iterable<IToken<?>> {
      * Returns the current token at the pointer.
      *
      * @return the current token
-     * @throws EOFError if the pointer is out of bounds
+     * @throws EOFException if the pointer is out of bounds
      */
-    public IToken<?> getCurrent() throws EOFError {
+    public IToken<?> getCurrent() throws EOFException {
         try {
             return this.content.get(this.pointer);
         } catch (IndexOutOfBoundsException e) {
-            throw new EOFError(this);
+            throw new EOFException(this);
         }
     }
 
@@ -159,7 +160,7 @@ public final class Sequence implements Iterable<IToken<?>> {
     public int getCurrentIndex() {
         try {
             return this.getCurrent().getIndex();
-        } catch (EOFError e) {
+        } catch (EOFException e) {
             return this.getEndIndex();
         }
     }
@@ -170,7 +171,7 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return the index of the first character
      */
     public int getStartIndex() {
-        if (this.getSize() == 0) throw new EOFError(this);
+        if (this.getSize() == 0) throw new EOFException(this);
         return this.content.getFirst().getIndex();
     }
 
@@ -197,7 +198,7 @@ public final class Sequence implements Iterable<IToken<?>> {
         IToken<?> token;
         try {
             token = this.getCurrent();
-        } catch (EOFError e) {
+        } catch (EOFException e) {
             return this.getEndIndex();
         }
         if (token instanceof ICompositeToken<?>) return ((ICompositeToken<?>) token).getSequence().getPointerIndex();
@@ -270,9 +271,9 @@ public final class Sequence implements Iterable<IToken<?>> {
      *
      * @return a copy of the remainder of the sequence
      */
-    public Sequence copyRemainder() throws EOFError {
+    public Sequence copyRemainder() throws EOFException {
 
-        if (this.isDone()) throw new EOFError(this);
+        if (this.isDone()) throw new EOFException(this);
 
         return new Sequence(this.getRemainder());
     }
@@ -301,7 +302,7 @@ public final class Sequence implements Iterable<IToken<?>> {
     public boolean isEof() {
         try {
             return this.getCurrent().matches(EOF.class);
-        } catch (EOFError e) {
+        } catch (EOFException e) {
             return true;
         }
     }
@@ -375,6 +376,28 @@ public final class Sequence implements Iterable<IToken<?>> {
         this.content.add(token);
     }
 
+    public void find(ICompositeToken<?> parent, IParser<?> target) throws NotFoundError {
+
+        while (!this.isEof()) {
+
+            try {
+                this.tryParse(parent, target);
+            } catch (BaseParseError | Interruption _) {
+                try {
+                    this.parseAndStep(parent, new Char());
+                } catch (BaseParseError _) {
+                    break;
+                }
+                continue;
+            }
+
+            return;
+        }
+
+        throw new NotFoundError(target);
+
+    }
+
     /**
      * Parses the input using the specified parser and parent composite token.
      *
@@ -384,7 +407,7 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return the parsed token
      * @throws GenericParseError if a parsing error occurs
      */
-    public <T extends IToken<?>> T find(ICompositeToken<?> parent, IParser<T> target) throws BaseParseError {
+    public <T extends IToken<?>> T tryParse(ICompositeToken<?> parent, IParser<T> target) throws BaseParseError {
 
         GenericParseError error;
 
@@ -414,7 +437,9 @@ public final class Sequence implements Iterable<IToken<?>> {
         T token;
 
         try {
-            token = this.find(parent, target);
+            token = this.tryParse(parent, target);
+        } catch (FailedTokenInterruption interruption) {
+            token = this.onFail(parent, target, interruption);
         } catch (Interruption interruption) {
             this.fusion(interruption.getToken());
             throw interruption.getCause();
@@ -448,6 +473,18 @@ public final class Sequence implements Iterable<IToken<?>> {
      */
     public void parseChar(ICompositeToken<?> parent, String whitelist) throws BaseParseError {
         this.parseAndStep(parent, DefinedChar.parser(whitelist));
+    }
+
+    private <T extends IToken<?>> T onFail(ICompositeToken<?> parent, IParser<T> target, FailedTokenInterruption interruption) throws BaseParseError {
+
+        if (interruption.getError() instanceof UnexpectedTokenError) {
+            this.fusion(interruption.getToken());
+            this.next();
+            return this.tryParse(parent, target);
+        }
+
+        return interruption.getToken();
+
     }
 
     /**

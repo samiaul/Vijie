@@ -54,7 +54,6 @@ public class RootParser<V, T extends IToken<V>> extends Root<V> {
         } catch (OptionalNotFound error) {
             throw error;
         } catch (GenericParseError error) {
-            //if (this.logError) System.err.println(error.getTraceback());
             throw (error instanceof ParserError)?((ParserError) error).getCause():error;
         }
 

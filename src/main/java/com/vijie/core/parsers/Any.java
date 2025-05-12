@@ -80,7 +80,7 @@ public class Any<T extends ICompositeToken<?>> implements IParser<T> {
 
         for (IParser<? extends T> target : this.targets) {
             try {
-                sequence.find(parent, target);
+                sequence.tryParse(parent, target);
                 return target.parse(parent, sequence);
             } catch (OptionalNotFound _) {
             } catch (GenericParseError cause) {

@@ -5,16 +5,16 @@ import com.vijie.core.Sequence;
 /**
  * Represents an error that occurs when an unexpected end of a sequence is encountered.
  */
-public final class EOFError extends RuntimeException {
+public final class EOFException extends RuntimeException {
 
     private final Sequence sequence;
 
     /**
-     * Constructs a new EOFError with the specified sequence.
+     * Constructs a new EOFException with the specified sequence.
      *
      * @param sequence the sequence that caused the error
      */
-    public EOFError(Sequence sequence) {
+    public EOFException(Sequence sequence) {
         super("Unexpected end of sequence");
         this.sequence = sequence;
     }

@@ -59,7 +59,8 @@ public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
         try {
             token.parse();
         } catch (GenericInterrupter error) {
-            if (!(error instanceof PendingInterrupter)) token.getSequence().clearRemainder();
+            //if (!(error instanceof FatalInterrupter)) token.getSequence().clearRemainder();
+            token.getSequence().setPointer(0);
             throw new Interruption(error, token);
         } catch (ParserError error) {
             throw this.onParseError(token, error);
@@ -105,6 +106,6 @@ public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
             params = "";
         }
 
-        return "{%s}%s".formatted(tokenType.getSimpleName(),params);
+        return "{%s}%s".formatted(tokenType.getSimpleName(), params);
     }
 }
