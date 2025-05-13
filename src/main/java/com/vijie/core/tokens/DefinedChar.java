@@ -34,8 +34,8 @@ public class DefinedChar extends NodeToken<Character> {
     /**
      * Constructs a DefinedChar node.
      *
-     * @param parent the parent composite node
-     * @param sequence the sequence to parse
+     * @param parent    the parent composite node
+     * @param sequence  the sequence to parse
      * @param whitelist the whitelist of characters allowed
      */
     public DefinedChar(ICompositeToken<?> parent, Sequence sequence, String whitelist) {
@@ -87,7 +87,8 @@ public class DefinedChar extends NodeToken<Character> {
 
     @Override
     public String toString() {
-        if (this.sequence.isDone()) return "(%s)@%d".formatted(escapeJava(this.getValue().toString()), this.getIndex());
-        return "(\"%s\")@%d".formatted(escapeJava(this.whitelist),this.getIndex());
+        return "(%s)@%d".formatted(
+                escapeJava((this.sequence.isDone()) ? this.getValue().toString() : this.whitelist),
+                this.getIndex());
     }
 }
