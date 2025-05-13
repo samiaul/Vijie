@@ -23,7 +23,7 @@ public class DefinedChar extends NodeToken<Character> {
      * @return a Factory instance for DefinedChar
      */
     public static Factory<DefinedChar> parser(String whitelist) {
-        return new Factory<>(DefinedChar.class, whitelist);
+        return Factory.of(DefinedChar.class, whitelist);
     }
 
     /**

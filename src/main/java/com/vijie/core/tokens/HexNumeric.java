@@ -17,7 +17,7 @@ public final class HexNumeric extends CharArray<String, HexDigit> {
      * @return a Factory instance for Numeric
      */
     public static Factory<HexNumeric> parser() {
-        return new Factory<>(HexNumeric.class);
+        return Factory.of(HexNumeric.class);
     }
 
     /**

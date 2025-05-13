@@ -17,7 +17,7 @@ public class Word extends CharArray<String, Letter> {
      * @return a Factory instance for Word
      */
     public static Factory<Word> parser() {
-        return new Factory<>(Word.class);
+        return Factory.of(Word.class);
     }
 
     /**

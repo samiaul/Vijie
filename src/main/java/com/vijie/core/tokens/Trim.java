@@ -24,9 +24,8 @@ public class Trim<V, T extends IToken<V>> extends Chain<V, T>
      * @param <T> the type of token being parsed
      * @return a Factory instance for Trim
      */
-    @SuppressWarnings("unchecked")
     public static <V, T extends IToken<V>> Factory<Trim<V, T>> parser(Factory<? extends T> target, String leftBlacklist, String rightBlacklist) {
-        return new Factory<>((Class<Trim<V, T>>) (Class<?>) Trim.class, target, leftBlacklist, rightBlacklist);
+        return Factory.of(Trim.class, target, leftBlacklist, rightBlacklist);
     }
 
     /**

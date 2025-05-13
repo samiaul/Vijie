@@ -16,7 +16,7 @@ public final class HexDigit extends DefinedChar {
      * @return a Factory instance for Digit
      */
     public static Factory<HexDigit> parser() {
-        return new Factory<>(HexDigit.class);
+        return Factory.of(HexDigit.class);
     }
 
     /**

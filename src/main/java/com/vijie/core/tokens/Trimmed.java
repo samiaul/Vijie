@@ -22,7 +22,7 @@ public class Trimmed extends CharArray<NullType, IToken<Character>>{
      * @return a Factory instance for Trimmed
      */
     public static Optional<Trimmed> parser(String blacklist) {
-        return new Optional<>(new Factory<>(Trimmed.class, blacklist));
+        return Optional.of(Factory.of(Trimmed.class, blacklist));
     }
 
     /**

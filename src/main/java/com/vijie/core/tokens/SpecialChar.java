@@ -26,7 +26,7 @@ public class SpecialChar extends Chain<Character, DefinedChar>  {
      * @return a Factory instance for DefinedChar
      */
     public static Factory<SpecialChar> parser(String whitelist) {
-        return new Factory<>(SpecialChar.class, whitelist);
+        return Factory.of(SpecialChar.class, whitelist);
     }
 
     /**

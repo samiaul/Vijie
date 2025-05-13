@@ -11,7 +11,7 @@ import com.vijie.core.tokens.Union;
 public class DummyCast extends Cast<Integer, Character, Digit> {
 
     public static Factory<DummyCast> parser() {
-        return new Factory<>(DummyCast.class);
+        return Factory.of(DummyCast.class);
     }
 
     public DummyCast(ICompositeToken<?> parent, Sequence sequence) {

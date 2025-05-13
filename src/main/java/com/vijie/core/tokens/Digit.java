@@ -16,7 +16,7 @@ public final class Digit extends DefinedChar {
      * @return a Factory instance for Digit
      */
     public static Factory<Digit> parser() {
-        return new Factory<>(Digit.class);
+        return Factory.of(Digit.class);
     }
 
     /**

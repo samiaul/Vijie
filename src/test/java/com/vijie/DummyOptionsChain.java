@@ -15,7 +15,7 @@ public class DummyOptionsChain<T extends IToken<String>> extends OptionsChain<St
 
     @SuppressWarnings("unchecked")
     public static <T extends IToken<String>> Factory<DummyOptionsChain<T>> parser(IParser<? extends T>... targets) {
-        return new Factory<>((Class<DummyOptionsChain<T>>) (Class<?>) DummyOptionsChain.class, (Object) targets);
+        return Factory.of(DummyOptionsChain.class, (Object) targets);
     }
 
     public DummyOptionsChain(ICompositeToken<?> parent, Sequence sequence, IParser<? extends T>[] targets) {

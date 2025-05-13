@@ -26,9 +26,8 @@ public class LeftTrim<V, T extends IToken<V>> extends Trim<V, T> {
      * @param <T> the type of token being parsed
      * @return a Factory instance for LeftTrim
      */
-    @SuppressWarnings("unchecked")
     public static <V, T extends IToken<V>> Factory<LeftTrim<V, T>> parser(Factory<? extends T> target, String blacklist) {
-        return new Factory<>((Class<LeftTrim<V, T>>) (Class<?>) LeftTrim.class, target, blacklist);
+        return Factory.of(LeftTrim.class, target, blacklist);
     }
 
     /**

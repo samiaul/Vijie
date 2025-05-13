@@ -17,7 +17,7 @@ public final class Numeric extends CharArray<String, Digit> {
      * @return a Factory instance for Numeric
      */
     public static Factory<Numeric> parser() {
-        return new Factory<>(Numeric.class);
+        return Factory.of(Numeric.class);
     }
 
     /**

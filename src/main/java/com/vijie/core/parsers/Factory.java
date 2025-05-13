@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
  */
 public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
 
+    @SuppressWarnings("unchecked")
+    public static <K extends ICompositeToken<?>, T extends K> Factory<T> of(Class<K> tokenType, Object... params) {
+        return new Factory<>((Class<T>) tokenType, params);
+    }
+
     /**
      * The class type of the token that this parser handles.
      */

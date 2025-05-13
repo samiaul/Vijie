@@ -16,7 +16,7 @@ public final class Lowercase extends DefinedChar {
      * @return a Factory instance for Lowercase
      */
     public static Factory<Lowercase> parser() {
-        return new Factory<>(Lowercase.class);
+        return Factory.of(Lowercase.class);
     }
 
     /**

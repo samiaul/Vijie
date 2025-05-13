@@ -8,7 +8,7 @@ import com.vijie.core.tokens.StringEnum;
 public class DummyStringEnum extends StringEnum {
 
     public static Factory<DummyStringEnum> parser(String... members) {
-        return new Factory<>(DummyStringEnum.class, (Object) members);
+        return Factory.of(DummyStringEnum.class, (Object) members);
     }
 
     public DummyStringEnum(ICompositeToken<?> parent, Sequence sequence, String[] members) {

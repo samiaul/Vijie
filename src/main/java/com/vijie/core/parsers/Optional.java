@@ -17,6 +17,10 @@ import com.vijie.core.interfaces.IToken;
  */
 public final class Optional<T extends IToken<?>> implements IParser<T> {
 
+    public static <T extends IToken<?>> Optional<T> of(IParser<T> parser) {
+        return new Optional<>(parser);
+    }
+
     /**
      * The target parser that this Optional parser will attempt to use.
      */
@@ -29,10 +33,6 @@ public final class Optional<T extends IToken<?>> implements IParser<T> {
      */
     public Optional(IParser<? extends T> target) {
         this.target = target;
-    }
-
-    public static <T extends IToken<?>> Optional<T> of(IParser<T> parser) {
-        return new Optional<>(parser);
     }
 
     /**

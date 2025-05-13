@@ -12,7 +12,7 @@ public class DummyStringChain<T extends IToken<String>> extends StringChain<T> {
 
     @SuppressWarnings("unchecked")
     public static <T extends IToken<String>> Factory<DummyStringChain<T>> parser(IParser<? extends T>... targets) {
-        return new Factory<>((Class<DummyStringChain<T>>) (Class<?>) DummyStringChain.class, (Object) targets);
+        return Factory.of(DummyStringChain.class, (Object) targets);
     }
 
     public DummyStringChain(ICompositeToken<?> parent, Sequence sequence, IParser<? extends T>[] targets) {

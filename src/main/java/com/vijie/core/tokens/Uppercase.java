@@ -16,7 +16,7 @@ public final class Uppercase extends DefinedChar {
      * @return a Factory instance for Uppercase
      */
     public static Factory<Uppercase> parser() {
-        return new Factory<>(Uppercase.class);
+        return Factory.of(Uppercase.class);
     }
 
     /**

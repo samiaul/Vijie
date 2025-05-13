@@ -13,7 +13,7 @@ public class DummyStringArray<T extends IToken<String>> extends StringArray<T> {
 
     @SuppressWarnings("unchecked")
     public static <T extends IToken<String>> Factory<DummyStringArray<T>> parser(Factory<? extends T> target, Integer extentMin, Integer extentMax) {
-        return new Factory<>((Class<DummyStringArray<T>>) (Class<?>) DummyStringArray.class, target, extentMin, extentMax);
+        return Factory.of(DummyStringArray.class, target, extentMin, extentMax);
     }
 
     public DummyStringArray(ICompositeToken<?> parent,

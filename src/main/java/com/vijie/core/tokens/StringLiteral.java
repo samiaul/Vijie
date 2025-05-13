@@ -18,7 +18,7 @@ public class StringLiteral extends Literal<String> {
      * @return a Factory instance for StringLiteral
      */
     public static Factory<StringLiteral> parser(String literal) {
-        return new Factory<>(StringLiteral.class, literal);
+        return Factory.of(StringLiteral.class, literal);
     }
 
     /**

@@ -10,7 +10,7 @@ import com.vijie.core.tokens.Union;
 public class DummyUnion extends Union<Character, DefinedChar> {
 
     public static Factory<DummyUnion> parser(Factory<DefinedChar>[] targets) {
-        return new Factory<>(DummyUnion.class, (Object) targets);
+        return Factory.of(DummyUnion.class, (Object) targets);
     }
 
     public DummyUnion(ICompositeToken<?> parent, Sequence sequence, Factory<DefinedChar>[] targets) {

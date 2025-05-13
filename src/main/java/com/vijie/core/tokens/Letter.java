@@ -18,7 +18,7 @@ public final class Letter extends Union<Character, ICompositeToken<Character>> {
      * @return a Factory instance for Letter
      */
     public static Factory<Letter> parser() {
-        return new Factory<>(Letter.class);
+        return Factory.of(Letter.class);
     }
 
     /**
@@ -28,7 +28,10 @@ public final class Letter extends Union<Character, ICompositeToken<Character>> {
      */
     @SuppressWarnings("unchecked")
     private static Factory<? extends ICompositeToken<Character>>[] constructTargets() {
-        return new Factory[]{ Uppercase.parser(), Lowercase.parser() };
+        return new Factory[]{
+                Uppercase.parser(),
+                Lowercase.parser()
+        };
     }
 
     /**
