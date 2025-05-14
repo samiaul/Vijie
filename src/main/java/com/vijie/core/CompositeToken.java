@@ -75,7 +75,7 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
      */
     @Override
     public String getRaw() {
-        return String.join("", Arrays.stream(this.getContent()).map(IToken::getRaw).toList());
+        return this.sequence.getRaw();
     }
 
     /**
@@ -168,7 +168,10 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
 
     @Override
     public String toString() {
-        String value = (this.sequence.isDone())?this.getValue().toString():"?";
-        return "%s(%s)@%d".formatted(this.getClass().getSimpleName(), value, this.getIndex());
+        //if (this.getValue() == null) System.out.println(this.getClass().getSimpleName());
+        return "%s(%s)@%d".formatted(
+                this.getClass().getSimpleName(),
+                (this.sequence.isDone())?this.getValue().toString():"?",
+                this.getIndex());
     }
 }

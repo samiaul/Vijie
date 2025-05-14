@@ -32,7 +32,7 @@ public class TokenStream<V, T extends IToken<V>> {
     }
 
     public static TokenStream<?, IToken<?>> of(ICompositeToken<?> source) {
-        return new TokenStream(Arrays.stream(source.getContent()).toList());
+        return source.getSequence().tokenStream();
     }
 
     public TokenStream<V, T> curate() {

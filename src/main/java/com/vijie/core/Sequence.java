@@ -83,6 +83,24 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
+     * Returns the sequence of tokens as a stream.
+     *
+     * @return a stream of tokens
+     */
+    public Stream<IToken<?>> stream() {
+        return this.content.stream();
+    }
+
+    /**
+     * Returns the sequence of tokens as a TokenStream.
+     *
+     * @return a TokenStream of tokens
+     */
+    public TokenStream<?, IToken<?>> tokenStream() {
+        return new TokenStream(this.content);
+    }
+
+    /**
      * Returns the pointer index in the sequence.
      *
      * @return the pointer index
@@ -206,13 +224,13 @@ public final class Sequence implements Iterable<IToken<?>> {
     }
 
     /**
-     * Returns the token at the specified index.
+     * Returns the token at the specified cursor.
      *
-     * @param index the index of the token to retrieve
+     * @param cursor the index in the sequence of the token to retrieve
      * @return the token at the specified index
      */
-    public IToken<?> get(int index) {
-        return this.content.get(index);
+    public IToken<?> get(int cursor) {
+        return this.content.get(cursor);
     }
 
     /**
@@ -222,20 +240,33 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return the Atom at the specified index
      * @throws IndexOutOfRange if the end of file is reached
      */
-    public Atom getAt(int index) throws IndexOutOfRange {
+    public Atom getAtom(int index) throws IndexOutOfRange {
+
+        IToken<?> token = this.getAt(index);
+
+        if (token instanceof Atom atom) return atom;
+        else if (token instanceof ICompositeToken<?> composite) return composite.getSequence().getAtom(index);
+
+        throw new RuntimeException("Unexpected token type: " + token.getClass().getName());
+
+    }
+
+    /**
+     * Gets the token at the specified index.
+     *
+     * @param index the index of the token to retrieve
+     * @return the token at the specified index
+     * @throws IndexOutOfRange if the end of file is reached
+     */
+    public IToken<?> getAt(int index) throws IndexOutOfRange {
 
         for (IToken<?> token : this.content) {
-
-            if (index < token.getIndex() || index >= token.getIndex() + token.getLength()) continue;
-
-            if (token instanceof Atom atom) return atom;
-            else if (token instanceof ICompositeToken<?> composite) return composite.getSequence().getAt(index);
-            throw new RuntimeException("Unexpected token type: " + token.getClass().getName());
-
+            if (index >= token.getIndex() || index < token.getIndex() + token.getLength()) return token;
         }
 
         throw new IndexOutOfRange(index);
     }
+
 
     Atom insert(int index, Character value) {
 
@@ -537,5 +568,9 @@ public final class Sequence implements Iterable<IToken<?>> {
     @Override
     public Spliterator<IToken<?>> spliterator() {
         return Iterable.super.spliterator();
+    }
+
+    public String getRaw() {
+        return String.join("", this.content.stream().map(IToken::getRaw).toList());
     }
 }

@@ -52,8 +52,8 @@ public abstract class Root<V> extends CompositeToken<V> implements IRootToken<V>
 
         Atom atom = this.getSequence().insert(index, value);
 
-        Atom previous = this.getSequence().getAt(index - 1);
-        Atom next = this.getSequence().getAt(index + 1);
+        Atom previous = this.getSequence().getAtom(index - 1);
+        Atom next = this.getSequence().getAtom(index + 1);
 
     }
 }
