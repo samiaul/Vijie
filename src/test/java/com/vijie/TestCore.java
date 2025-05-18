@@ -773,10 +773,10 @@ public class TestCore {
         assertDoesNotThrow(root::parse);
 
         assertSame(sequence.getContent()[0], ((ICompositeToken<?>) ((ICompositeToken<?>) root.getContent()[0]).getContent()[0]).getContent()[0]);
-        assertSame(sequence.getContent()[0], root.getSequence().getAt(0));
+        assertSame(sequence.getContent()[0], root.getSequence().getAtom(0));
 
-        assertEquals("ABC", root.getSequence().getAt(0).getParent().getValue());
-        assertEquals("DEF", root.getSequence().getAt(5).getParent().getValue());
+        assertEquals("ABC", root.getSequence().getAtom(0).getParent().getValue());
+        assertEquals("DEF", root.getSequence().getAtom(5).getParent().getValue());
 
 
 
