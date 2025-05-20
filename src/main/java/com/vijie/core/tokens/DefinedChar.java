@@ -1,7 +1,7 @@
 package com.vijie.core.tokens;
 
 
-import com.vijie.core.Atom;
+import com.vijie.core.symbols.Atom;
 import com.vijie.core.NodeToken;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;

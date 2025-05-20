@@ -1,6 +1,6 @@
 package com.vijie.core.parsers;
 
-import com.vijie.core.Atom;
+import com.vijie.core.symbols.Atom;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.EOFParseError;
 import com.vijie.core.errors.ExpectedGlyphError;
@@ -38,6 +38,7 @@ public final class Char implements IParser<Atom> {
             atom.setParent(parent);
             return atom;
         }
+
         throw new ExpectedGlyphError(sequence, current);
     }
 

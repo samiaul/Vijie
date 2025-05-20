@@ -2,6 +2,7 @@ package com.vijie.core;
 
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.INodeToken;
+import com.vijie.core.interfaces.IToken;
 
 
 /**
@@ -45,6 +46,15 @@ public abstract class NodeToken<V> extends CompositeToken<V> implements INodeTok
         return this.parent.getDepth() + 1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends IToken<?>> T findParent(Class<T> clazz) {
+        if (clazz.isInstance(this.parent)) return (T) this.parent;
+        if (this.parent instanceof INodeToken<?> node) return node.findParent(clazz);
+        return null;
+    }
 
     /**
      * Generates a string representation of the node for debugging purposes.

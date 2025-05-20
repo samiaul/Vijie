@@ -1,7 +1,8 @@
-package com.vijie.core;
+package com.vijie.core.safe;
 
+import com.vijie.core.NodeToken;
+import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
-import com.vijie.core.interfaces.ICompositeFailedToken;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IParser;
 import com.vijie.core.interfaces.IUnknownToken;

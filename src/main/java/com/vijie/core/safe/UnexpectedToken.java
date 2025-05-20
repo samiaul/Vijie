@@ -1,5 +1,7 @@
-package com.vijie.core;
+package com.vijie.core.safe;
 
+import com.vijie.core.NodeToken;
+import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeFailedToken;
 import com.vijie.core.interfaces.ICompositeToken;
@@ -57,6 +59,6 @@ public class UnexpectedToken extends NodeToken<NullType> implements ICompositeFa
 
     @Override
     public String toString() {
-        return "UnexpectedToken(\"%s\")@%d".formatted(this.getRaw(), this.getIndex());
+        return "Unexpected(\"%s\")@%d".formatted(this.getRaw(), this.getIndex());
     }
 }

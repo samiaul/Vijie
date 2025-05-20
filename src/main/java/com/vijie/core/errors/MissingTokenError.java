@@ -1,10 +1,7 @@
 package com.vijie.core.errors;
 
-import com.vijie.core.MissingToken;
+import com.vijie.core.safe.MissingToken;
 import com.vijie.core.Sequence;
-import com.vijie.core.interfaces.IToken;
-
-import java.util.List;
 
 
 public class MissingTokenError extends GenericFailedTokenError {

@@ -1,6 +1,6 @@
 package com.vijie;
 
-import com.vijie.core.Atom;
+import com.vijie.core.symbols.Atom;
 import com.vijie.core.Token;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.INodeToken;
@@ -773,10 +773,10 @@ public class TestCore {
         assertDoesNotThrow(root::parse);
 
         assertSame(sequence.getContent()[0], ((ICompositeToken<?>) ((ICompositeToken<?>) root.getContent()[0]).getContent()[0]).getContent()[0]);
-        assertSame(sequence.getContent()[0], root.getSequence().getAtom(0));
+        assertSame(sequence.getContent()[0], root.getSequence().getSymbol(0));
 
-        assertEquals("ABC", root.getSequence().getAtom(0).getParent().getValue());
-        assertEquals("DEF", root.getSequence().getAtom(5).getParent().getValue());
+        assertEquals("ABC", root.getSequence().getSymbol(0).getParent().getValue());
+        assertEquals("DEF", root.getSequence().getSymbol(5).getParent().getValue());
 
 
 

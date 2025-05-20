@@ -3,8 +3,12 @@ package com.vijie.core;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IParser;
+import com.vijie.core.interfaces.ISymbol;
 import com.vijie.core.interfaces.IToken;
 import com.vijie.core.parsers.Char;
+import com.vijie.core.symbols.Atom;
+import com.vijie.core.symbols.EOF;
+import com.vijie.core.symbols.Symbol;
 import com.vijie.core.tokens.DefinedChar;
 
 import java.util.*;
@@ -229,8 +233,9 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @param cursor the index in the sequence of the token to retrieve
      * @return the token at the specified index
      */
-    public IToken<?> get(int cursor) {
-        return this.content.get(cursor);
+    @SuppressWarnings("unchecked")
+    public <T extends IToken<?>> T get(int cursor) {
+        return (T) this.content.get(cursor);
     }
 
     /**
@@ -240,14 +245,16 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return the Atom at the specified index
      * @throws IndexOutOfRange if the end of file is reached
      */
-    public Atom getAtom(int index) throws IndexOutOfRange {
+    public Symbol<?> getSymbol(int index) throws IndexOutOfRange {
 
         IToken<?> token = this.getAt(index);
 
-        if (token instanceof Atom atom) return atom;
-        else if (token instanceof ICompositeToken<?> composite) return composite.getSequence().getAtom(index);
+        return switch (token) {
+            case Symbol<?> symbol -> symbol;
+            case ICompositeToken<?> composite -> composite.getSequence().getSymbol(index);
+            default -> throw new IndexOutOfRange(index);
+        };
 
-        throw new RuntimeException("Unexpected token type: " + token.getClass().getName());
 
     }
 
@@ -261,7 +268,7 @@ public final class Sequence implements Iterable<IToken<?>> {
     public IToken<?> getAt(int index) throws IndexOutOfRange {
 
         for (IToken<?> token : this.content) {
-            if (index >= token.getIndex() || index < token.getIndex() + token.getLength()) return token;
+            if (index >= token.getIndex() && index < token.getIndex() + token.getLength()) return token;
         }
 
         throw new IndexOutOfRange(index);
@@ -302,7 +309,7 @@ public final class Sequence implements Iterable<IToken<?>> {
      *
      * @return a copy of the remainder of the sequence
      */
-    public Sequence copyRemainder() throws EOFException {
+    public Sequence copyRemainder() throws EOFException, EOFParseError {
 
         if (this.isDone()) throw new EOFException(this);
 
@@ -400,6 +407,18 @@ public final class Sequence implements Iterable<IToken<?>> {
     public void fusion(IToken<?> token) {
         this.content.subList(this.pointer, Math.min(this.pointer + token.getLength(), this.getSize())).clear();
         this.content.add(this.pointer, token);
+        this.reroot(token);
+    }
+
+    private void reroot(IToken<?> token) {
+
+        if (token instanceof ICompositeToken<?> parent) {
+            for (IToken<?> child : parent.getContent()) {
+                if (child instanceof ISymbol<?> symbol) symbol.setParent(parent);
+                else if (child instanceof ICompositeToken<?> composite) composite.getSequence().reroot(composite);
+            }
+        }
+
     }
 
     public void append(IToken<?> token) {
@@ -473,6 +492,7 @@ public final class Sequence implements Iterable<IToken<?>> {
             token = this.onFail(parent, target, interruption);
         } catch (Interruption interruption) {
             this.fusion(interruption.getToken());
+            this.clearRemainder();
             throw interruption.getCause();
         }
 
@@ -573,4 +593,5 @@ public final class Sequence implements Iterable<IToken<?>> {
     public String getRaw() {
         return String.join("", this.content.stream().map(IToken::getRaw).toList());
     }
+
 }

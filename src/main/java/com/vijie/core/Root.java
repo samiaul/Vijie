@@ -2,6 +2,8 @@ package com.vijie.core;
 
 import com.vijie.core.interfaces.IRootToken;
 import com.vijie.core.interfaces.IToken;
+import com.vijie.core.symbols.Atom;
+import com.vijie.core.symbols.Symbol;
 
 /**
  * Abstract class Root that extends CompositeToken and implements IRootToken.
@@ -50,10 +52,10 @@ public abstract class Root<V> extends CompositeToken<V> implements IRootToken<V>
 
     public void insert(int index, Character value) {
 
-        Atom atom = this.getSequence().insert(index, value);
+        Symbol<?> atom = this.getSequence().insert(index, value);
 
-        Atom previous = this.getSequence().getAtom(index - 1);
-        Atom next = this.getSequence().getAtom(index + 1);
+        Symbol<?> previous = this.getSequence().getSymbol(index - 1);
+        Symbol<?> next = this.getSequence().getSymbol(index + 1);
 
     }
 }

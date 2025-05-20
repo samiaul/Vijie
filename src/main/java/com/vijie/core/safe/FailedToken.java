@@ -1,16 +1,18 @@
-package com.vijie.core;
+package com.vijie.core.safe;
 
+import com.vijie.core.NodeToken;
+import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
-import com.vijie.core.interfaces.ICompositeFailedToken;
 import com.vijie.core.interfaces.ICompositeToken;
 import com.vijie.core.interfaces.IFailedToken;
 import com.vijie.core.interfaces.IParser;
+import com.vijie.core.symbols.Break;
 
 import javax.lang.model.type.NullType;
 
 public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullType> implements IFailedToken<T> {
 
-    protected final T token;
+    protected final IParser<T> target;
     protected final GenericInterrupter interrupter;
     protected final IParser<?> syncTarget;
 
@@ -22,19 +24,24 @@ public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullTyp
      */
     public FailedToken(ICompositeToken<?> parent,
                        Sequence sequence,
-                       T token,
+                       IParser<T> target,
                        GenericInterrupter interrupter,
                        IParser<?> syncTarget) {
         super(parent, sequence);
 
-        this.token = token;
+        this.target = target;
         this.interrupter = interrupter;
         this.syncTarget = syncTarget;
     }
 
     @Override
+    public IParser<T> getTarget() {
+        return target;
+    }
+
+    @Override
     public T getToken() {
-        return token;
+        return this.sequence.get(0);
     }
 
     @Override
@@ -55,20 +62,36 @@ public class FailedToken<T extends ICompositeToken<?>> extends NodeToken<NullTyp
     @Override
     public void parse() throws GenericInterrupter {
 
+        boolean toThrow = false;
+
+        Sequence sequence = this.sequence.copy();
+
         try {
-            this.sequence.find(this, this.syncTarget);
+            sequence.find(this, this.syncTarget);
         } catch (NotFoundError error) {
-            throw new Interruption(this.interrupter, this.token);
+            toThrow = true;
         }
 
-        this.sequence.clearFrom();
-        if (this.sequence.getSize() == 0) throw new EOFInterrupter(sequence);
+        sequence.clearFrom();
+        if (sequence.getSize() == 0) throw new EOFInterrupter(sequence);
 
+        if (!toThrow) {
+            this.sequence.clearFrom(sequence.getPointer());
+            this.sequence.append(new Break(this, sequence.getEndIndex() - 1));
+        }
+
+        try {
+            this.sequence.parseAndStep(this, this.target);
+        } catch (GenericInterrupter interrupter) {
+            if (toThrow) throw new Interruption(interrupter, this.getToken());
+        } catch (BaseParseError error) {
+            throw new RuntimeException(error);
+        }
 
     }
 
     @Override
     public String toString() {
-        return "Failed(%s)@%d".formatted(this.token, this.getIndex());
+        return "Failed(%s)@%d".formatted(this.target, this.getIndex());
     }
 }

@@ -23,4 +23,9 @@ public class FailedTokenInterruption extends RuntimeException {
     public <T extends IToken<?>> T getToken() {
         return (T) this.failedToken;
     }
+
+    @Override
+    public String toString() {
+        return "FailedTokenInterruption(%s, %s)".formatted(this.failedToken, failedToken.getError());
+    }
 }

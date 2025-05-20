@@ -22,5 +22,15 @@ public interface INodeToken<V> extends IToken<V> {
     default IRootToken<?> getRoot() {
         if (this.getParent() instanceof IRootToken<?>) return (IRootToken<?>) this.getParent();
         return ((INodeToken<?>) this.getParent()).getRoot();
-    };
+    }
+
+    /**
+     * Finds the nearest parent of the specified type in the token hierarchy.
+     *
+     * @param <T>   the type of the parent token to find
+     * @param clazz the class object representing the type of the parent token
+     * @return the nearest parent of the specified type, or {@code null} if no such parent exists
+     */
+    <T extends IToken<?>> T findParent(Class<T> clazz);
+
 }

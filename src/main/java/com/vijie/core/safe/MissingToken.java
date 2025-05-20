@@ -1,24 +1,25 @@
-package com.vijie.core;
+package com.vijie.core.safe;
 
+import com.vijie.core.NodeToken;
+import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.*;
+import com.vijie.core.symbols.Epsilon;
 
 import javax.lang.model.type.NullType;
 
-public class MissingToken<T extends IToken<?>> extends Token<NullType> implements INodeToken<NullType>, IGenericFailedToken {
+public class MissingToken<T extends IToken<?>> extends NodeToken<NullType> implements ICompositeFailedToken {
 
-    protected final ICompositeToken<?> parent;
-    protected final int index;
     protected final IParser<T> target;
     protected final MissingTokenInterrupter interrupter;
 
     public MissingToken(ICompositeToken<?> parent,
-                        int index,
+                        Sequence sequence,
                         IParser<T> target,
                         MissingTokenInterrupter interrupter) {
 
-        this.parent = parent;
-        this.index = index;
+        super(parent, sequence);
+
         this.target = target;
         this.interrupter = interrupter;
     }
@@ -32,38 +33,14 @@ public class MissingToken<T extends IToken<?>> extends Token<NullType> implement
     }
 
     @Override
-    public String getRaw() {
-        return "";
-    }
-
-    @Override
-    public int getIndex() {
-        return this.index;
-    }
-
-    @Override
-    public ICompositeToken<?> getParent() {
-        return this.parent;
-    }
-
-    @Override
-    public int getLength() {
-        return 0;
-    }
-
-    @Override
-    public int getDepth() {
-        return this.parent.getDepth() + 1;
-    }
-
-    @Override
     public NullType getValue() {
         return null;
     }
 
     @Override
-    public String getSequenceRepr() {
-        return "";
+    public void parse() {
+        this.sequence.fusion(new Epsilon(this, this.sequence.getCurrentIndex()));
+        this.sequence.clearRemainder();
     }
 
     @Override

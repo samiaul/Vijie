@@ -3,6 +3,10 @@ package com.vijie.core.parsers;
 import com.vijie.core.*;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.*;
+import com.vijie.core.safe.FailedToken;
+import com.vijie.core.safe.MissingToken;
+import com.vijie.core.safe.UnexpectedToken;
+import com.vijie.core.safe.UnknownToken;
 
 public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
 
@@ -10,6 +14,10 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
     protected final IParser<?> syncTarget;
     protected final Class<? extends MissingTokenInterrupter> missingInterrupter;
 
+
+    /**
+     * Create a safe parser for UnexpectedTokens
+     */
     public SafeParser(IParser<T> target,
                       IParser<?> syncTarget,
                       Class<? extends MissingTokenInterrupter> missingInterrupter) {
@@ -18,15 +26,24 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
         this.missingInterrupter = missingInterrupter;
     }
 
+    /**
+     * Create a safe parser for UnexpectedTokens
+     */
     public SafeParser(IParser<T> syncTarget) {
         this(syncTarget, null, null);
     }
 
+    /**
+     * Create a safe parser for FailedTokens
+     */
     public SafeParser(IParser<T> target,
                       IParser<?> syncTarget) {
         this(target, syncTarget, null);
     }
 
+    /**
+     * Create a safe parser for MissingTokens
+     */
     public SafeParser(IParser<T> target,
                       Class<MissingTokenInterrupter> missingInterrupter) {
         this(target, null, missingInterrupter);
@@ -67,9 +84,9 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
 
         if (interrupter instanceof FatalInterrupter) throw interruption;
 
-        if (this.syncTarget == null && this.missingInterrupter == null) failedToken = getUnexpected(parent, sequence, interrupter);
-        else if (this.syncTarget == null) return this.getMissing(parent, sequence);
-        else failedToken = this.getFailed(parent, sequence, interruption.getToken(), interruption.getCause());
+        if (this.syncTarget != null) failedToken = this.getFailed(parent, sequence, interruption.getCause());
+        else if (this.missingInterrupter != null) failedToken = this.getMissing(parent, sequence);
+        else failedToken = this.getUnexpected(parent, sequence, interruption.getCause());
 
         return this.parseToken(parent, sequence, failedToken);
     }
@@ -78,8 +95,8 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
 
         ICompositeFailedToken failedToken;
 
-        if (syncTarget == null) failedToken = getUnexpected(parent, sequence, interrupter);
-        else failedToken = this.getUnknown(parent, sequence, interrupter);
+        if (syncTarget != null) failedToken = this.getUnknown(parent, sequence, interrupter);
+        else failedToken = getUnexpected(parent, sequence, interrupter);
 
         return this.parseToken(parent, sequence, failedToken);
     }
@@ -90,7 +107,8 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
             failedToken.parse();
         } catch (EOFInterrupter _) {
             if (this.missingInterrupter == null) throw failedToken.getInterrupter();
-            return this.getMissing(parent, sequence);
+            return this.parseToken(parent, sequence, this.getMissing(parent, sequence));
+
         } catch (GenericInterrupter error) {
             throw new Interruption(failedToken.getInterrupter(), failedToken);
         }
@@ -98,8 +116,8 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
         return failedToken;
     }
 
-    protected IFailedToken<T> getFailed(ICompositeToken<?> parent, Sequence sequence, T token, GenericInterrupter interrupter) {
-        return new FailedToken<>(parent, sequence.copy(), token, interrupter, this.syncTarget);
+    protected IFailedToken<T> getFailed(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
+        return new FailedToken<>(parent, sequence.copy(), this.target, interrupter, this.syncTarget);
     }
 
     protected IUnknownToken<T> getUnknown(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
@@ -107,11 +125,11 @@ public class SafeParser<T extends ICompositeToken<?>> implements IParser<T> {
     }
 
     protected UnexpectedToken getUnexpected(ICompositeToken<?> parent, Sequence sequence, GenericInterrupter interrupter) {
-        return new UnexpectedToken(parent, sequence, interrupter, this.target);
+        return new UnexpectedToken(parent, sequence.copy(), interrupter, this.target);
     }
 
     protected MissingToken<T> getMissing(ICompositeToken<?> parent, Sequence sequence) {
-        return new MissingToken<>(parent, sequence.getCurrentIndex(), this.target, this.instantiateInterrupter(sequence));
+        return new MissingToken<>(parent, sequence.copy(), this.target, this.instantiateInterrupter(sequence));
     }
 
     protected MissingTokenInterrupter instantiateInterrupter(Sequence sequence) {
