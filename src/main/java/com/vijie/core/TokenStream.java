@@ -35,6 +35,10 @@ public class TokenStream<V, T extends IToken<V>> {
         return source.getSequence().tokenStream();
     }
 
+    public static TokenStream<?, IToken<?>> of() {
+        return new TokenStream(List.of());
+    }
+
     public TokenStream<V, T> curate() {
         List<T> filtered = new ArrayList<>();
         for (T item : content) {
@@ -64,6 +68,14 @@ public class TokenStream<V, T extends IToken<V>> {
             if (item.matches(tokenTypes)) filtered.add((K) item);
         }
         return new TokenStream(filtered);
+    }
+
+    public TokenStream<V, T> filter(Function<T, Boolean> predicate) {
+        List<T> filtered = new ArrayList<>();
+        for (T item : content) {
+            if (predicate.apply(item)) filtered.add(item);
+        }
+        return new TokenStream<>(filtered);
     }
 
     public <O> Stream<O> flatMap(Function<T, List<O>> mapper) {
