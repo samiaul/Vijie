@@ -1,6 +1,6 @@
 package com.vijie.core.errors;
 
-import com.vijie.core.safe.UnexpectedToken;
+import com.vijie.core.dummy.UnexpectedToken;
 
 public class UnexpectedTokenError extends GenericFailedTokenError {
 

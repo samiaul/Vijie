@@ -1,13 +1,13 @@
 package com.vijie.core.errors;
 
-import com.vijie.core.interfaces.IGenericFailedToken;
+import com.vijie.core.interfaces.IDummyToken;
 import com.vijie.core.interfaces.IToken;
 
 public class FailedTokenInterruption extends RuntimeException {
 
-    private final IGenericFailedToken failedToken;
+    private final IDummyToken failedToken;
 
-    public FailedTokenInterruption(IGenericFailedToken failedToken) {
+    public FailedTokenInterruption(IDummyToken failedToken) {
         super("Saved token: " + failedToken);
         this.failedToken = failedToken;
     }
@@ -16,7 +16,7 @@ public class FailedTokenInterruption extends RuntimeException {
         return this.failedToken.getError();
     }
 
-    public IGenericFailedToken getFailedToken() {
+    public IDummyToken getFailedToken() {
         return this.failedToken;
     }
 

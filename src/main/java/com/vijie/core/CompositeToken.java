@@ -4,7 +4,6 @@ import com.vijie.core.errors.BaseParseError;
 import com.vijie.core.errors.GenericFailedTokenError;
 import com.vijie.core.errors.TokenInstantiationError;
 import com.vijie.core.interfaces.ICompositeToken;
-import com.vijie.core.interfaces.IGenericFailedToken;
 import com.vijie.core.interfaces.IToken;
 
 import java.lang.reflect.InvocationTargetException;
@@ -134,7 +133,7 @@ public abstract class CompositeToken<V> extends Token<V> implements ICompositeTo
 
         for (IToken<?> token : this.getContent()) {
             if (token instanceof ICompositeToken<?> compositeToken) errors.addAll(compositeToken.getErrors());
-            if (token instanceof IGenericFailedToken failedToken) errors.add(failedToken.getError());
+            //if (token instanceof IDummyToken failedToken) errors.add(failedToken.getError());
         }
 
         return errors;

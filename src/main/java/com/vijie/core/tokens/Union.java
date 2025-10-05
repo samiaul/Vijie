@@ -51,9 +51,8 @@ public abstract class Union<V, T extends IToken<V>> extends NodeToken<V>
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public T getToken() {
-        return ((T) this.getContent()[0]);
+        return this.sequence.get(0);
     }
 
     /**

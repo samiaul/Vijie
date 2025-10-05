@@ -1,7 +1,7 @@
 package com.vijie.core;
 
 import com.vijie.core.interfaces.ICompositeToken;
-import com.vijie.core.interfaces.IGenericFailedToken;
+import com.vijie.core.interfaces.IDummyToken;
 import com.vijie.core.interfaces.IToken;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class TokenStream<V, T extends IToken<V>> {
     public TokenStream<V, T> curate() {
         List<T> filtered = new ArrayList<>();
         for (T item : content) {
-            if (item instanceof IGenericFailedToken) continue;
+            if (item instanceof IDummyToken) continue;
             filtered.add(item);
         }
 
@@ -84,6 +84,14 @@ public class TokenStream<V, T extends IToken<V>> {
             flatMapped.addAll(mapper.apply(item));
         }
         return flatMapped.stream();
+    }
+
+    public <O> Stream<O> map(Function<T, O> mapper) {
+        List<O> mapped = new ArrayList<>();
+        for (T item : content) {
+            mapped.add(mapper.apply(item));
+        }
+        return mapped.stream();
     }
 
     public final List<V> getValues() {

@@ -27,9 +27,19 @@ public class DefinedChar extends NodeToken<Character> {
     }
 
     /**
+     * Creates a factory for DefinedChar with a specified character.
+     *
+     * @param character the character allowed
+     * @return a Factory instance for DefinedChar
+     */
+    public static Factory<DefinedChar> parser(Character character) {
+        return Factory.of(DefinedChar.class, character.toString());
+    }
+
+    /**
      * The whitelist of characters allowed.
      */
-    private final String whitelist;
+    protected final String whitelist;
 
     /**
      * Constructs a DefinedChar node.

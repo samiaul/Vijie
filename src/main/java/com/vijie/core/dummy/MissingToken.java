@@ -1,31 +1,22 @@
-package com.vijie.core.safe;
+package com.vijie.core.dummy;
 
-import com.vijie.core.NodeToken;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.*;
 import com.vijie.core.interfaces.*;
 import com.vijie.core.symbols.Epsilon;
 
 import javax.lang.model.type.NullType;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MissingToken<T extends IToken<?>> extends NodeToken<NullType> implements ICompositeFailedToken {
-
-    protected final IParser<T> target;
-    protected final MissingTokenInterrupter interrupter;
+public class MissingToken<T extends IToken<?>> extends GenericDummyToken {
 
     public MissingToken(ICompositeToken<?> parent,
                         Sequence sequence,
                         IParser<T> target,
                         MissingTokenInterrupter interrupter) {
+        super(parent, sequence, interrupter, target);
 
-        super(parent, sequence);
-
-        this.target = target;
-        this.interrupter = interrupter;
-    }
-
-    public MissingTokenInterrupter getInterrupter() {
-        return interrupter;
     }
 
     public GenericFailedTokenError getError() {
@@ -33,8 +24,8 @@ public class MissingToken<T extends IToken<?>> extends NodeToken<NullType> imple
     }
 
     @Override
-    public NullType getValue() {
-        return null;
+    public List<GenericFailedTokenError> getErrors() {
+        return new ArrayList<>();
     }
 
     @Override
@@ -45,6 +36,6 @@ public class MissingToken<T extends IToken<?>> extends NodeToken<NullType> imple
 
     @Override
     public String toString() {
-        return "Missing(%s)@%d".formatted(this.target, this.getIndex());
+        return "Missing(%s)@%d".formatted(this.syncTarget, this.getIndex());
     }
 }

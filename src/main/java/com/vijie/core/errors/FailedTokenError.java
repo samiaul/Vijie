@@ -1,10 +1,10 @@
 package com.vijie.core.errors;
 
-import com.vijie.core.interfaces.ICompositeFailedToken;
+import com.vijie.core.interfaces.IDummyToken;
 
 public class FailedTokenError extends GenericFailedTokenError {
 
-    public FailedTokenError(ICompositeFailedToken failedToken) {
+    public FailedTokenError(IDummyToken failedToken) {
         super(failedToken.getSequence(), failedToken);
     }
 

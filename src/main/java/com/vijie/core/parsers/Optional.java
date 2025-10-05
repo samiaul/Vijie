@@ -44,7 +44,6 @@ public final class Optional<T extends IToken<?>> implements IParser<T> {
         return target;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -53,12 +52,12 @@ public final class Optional<T extends IToken<?>> implements IParser<T> {
         return this.target.getType();
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public T parse(ICompositeToken<?> parent, Sequence sequence) throws BaseParseError {
+
         try {
             return sequence.parse(parent, this.target);
         } catch (ParserError error) {

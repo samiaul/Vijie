@@ -38,7 +38,8 @@ public final class TokenInstantiationError extends Error {
         return switch (cause) {
             case NoSuchMethodException _ ->
                     "No suitable constructor found for %s: %s | %s".formatted(token.getName(), Arrays.toString(prependParamType(params)),Arrays.toString(token.getConstructors()) );
-            // case InstantiationException _ -> "";
+            case InstantiationException _ ->
+                    "Error while instantiating %s".formatted(token.getName());
             // case IllegalAccessException _ -> "";
             case null, default -> {
                 assert cause != null;

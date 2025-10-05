@@ -45,6 +45,6 @@ public final class Interruption extends RuntimeException {
 
     @Override
     public String toString() {
-        return "Interruption(\"%s\", %s)".formatted(this.getCause().getMessage(), this.token);
+        return "Interruption(%s(\"%s\"), %s)".formatted(this.getCause().getClass().getSimpleName(), this.getCause().getMessage(), this.token);
     }
 }

@@ -13,6 +13,7 @@ import com.vijie.core.tokens.DefinedChar;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -155,7 +156,7 @@ public final class Sequence implements Iterable<IToken<?>> {
      * @return an array of tokens from the start to the pointer
      */
     public IToken<?>[] getConsumed() {
-        int toIndex = Math.clamp(this.pointer + 1, 0, this.getSize());
+        int toIndex = Math.clamp(this.pointer, 0, this.getSize());
         return this.content.subList(0, toIndex).toArray(IToken<?>[]::new);
     }
 
@@ -235,7 +236,11 @@ public final class Sequence implements Iterable<IToken<?>> {
      */
     @SuppressWarnings("unchecked")
     public <T extends IToken<?>> T get(int cursor) {
-        return (T) this.content.get(cursor);
+        try {
+            return (T) this.content.get(cursor);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfRange(cursor);
+        }
     }
 
     /**
@@ -444,7 +449,7 @@ public final class Sequence implements Iterable<IToken<?>> {
             return;
         }
 
-        throw new NotFoundError(target);
+        throw new NotFoundError(this, target);
 
     }
 
@@ -594,4 +599,9 @@ public final class Sequence implements Iterable<IToken<?>> {
         return String.join("", this.content.stream().map(IToken::getRaw).toList());
     }
 
+    @Override
+    public String toString() {
+        return "[" + Arrays.stream(this.getConsumed()).map(Object::toString).collect(Collectors.joining(", ")) +
+                 " | " + Arrays.stream(this.getRemainder()).map(Object::toString).collect(Collectors.joining(", ")) + "]";
+    }
 }

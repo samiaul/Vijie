@@ -162,7 +162,7 @@ public class TestCore {
     @Test
     void testParent() {
 
-        Factory<DefinedChar> parser = DefinedChar.parser("A");
+        Factory<DefinedChar> parser = DefinedChar.parser('.');
 
         RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
 
@@ -175,7 +175,7 @@ public class TestCore {
     @Test
     void testRoot() {
 
-        Factory<DefinedChar> parser = DefinedChar.parser("A");
+        Factory<DefinedChar> parser = DefinedChar.parser('.');
 
         RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
 
@@ -189,7 +189,7 @@ public class TestCore {
     @Test
     void testDepth() {
 
-        Factory<DefinedChar> parser = DefinedChar.parser("A");
+        Factory<DefinedChar> parser = DefinedChar.parser('.');
 
         RootParser<Character, DefinedChar> root = new RootParser<>("ABC", parser);
 
@@ -205,7 +205,7 @@ public class TestCore {
     @Test
     void testDefinedChar() {
 
-        Factory<DefinedChar> parser = DefinedChar.parser("A");
+        Factory<DefinedChar> parser = DefinedChar.parser('.');
 
         RootParser<Character, DefinedChar> root = new RootParser<>("A", parser);
 
@@ -398,9 +398,9 @@ public class TestCore {
     @SuppressWarnings("unchecked")
     void testUnion() {
 
-        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
+        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser('.'), DefinedChar.parser('.')};
         Factory<DummyUnion> parser1 = DummyUnion.parser(targets);
-        Factory<DefinedChar> parser2 = DefinedChar.parser("1");
+        Factory<DefinedChar> parser2 = DefinedChar.parser('.');
 
         RootParser<Character, DummyUnion> root1 = new RootParser<>("1", parser1);
         RootParser<Character, DefinedChar> root2 = new RootParser<>("1", parser2);
@@ -418,7 +418,7 @@ public class TestCore {
     @SuppressWarnings("unchecked")
     void testUnionError() {
 
-        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser("1"), DefinedChar.parser("2")};
+        Factory<DefinedChar>[] targets = new Factory[]{DefinedChar.parser('.'), DefinedChar.parser('.')};
         Factory<DummyUnion> parser = DummyUnion.parser(targets);
 
         RootParser<Character, DummyUnion> root = new RootParser<>("A", parser, false);
@@ -715,14 +715,14 @@ public class TestCore {
     @Test
     void testFactory() {
 
-        assertEquals(DefinedChar.class, DefinedChar.parser("A").getType());
+        assertEquals(DefinedChar.class, DefinedChar.parser('.').getType());
 
     }
 
     @Test
     void testChar() {
 
-        RootParser<Character, DefinedChar> inner = new RootParser<>("A", DefinedChar.parser("A"));
+        RootParser<Character, DefinedChar> inner = new RootParser<>("A", DefinedChar.parser('.'));
 
         assertDoesNotThrow(inner::parse);
 
@@ -741,7 +741,7 @@ public class TestCore {
     @Test
     void testOptional() {
 
-        Factory<DefinedChar> target = DefinedChar.parser("1");
+        Factory<DefinedChar> target = DefinedChar.parser('.');
         Optional<DefinedChar> parser = new Optional<>(target);
 
         assertEquals(target, parser.getTarget());

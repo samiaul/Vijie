@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of Composite token that this parser handles
  */
-public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
+public class Factory<T extends ICompositeToken<?>> extends GenericFactory<T> {
 
     @SuppressWarnings("unchecked")
     public static <K extends ICompositeToken<?>, T extends K> Factory<T> of(Class<K> tokenType, Object... params) {
@@ -53,36 +53,9 @@ public class Factory<T extends ICompositeToken<?>> implements IParser<T> {
         return this.tokenType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public T parse(ICompositeToken<?> parent, Sequence sequence) throws BaseParseError {
-
-        T token = CompositeToken.instantiate(this.tokenType, parent, sequence, this.params);
-
-        try {
-            token.parse();
-        } catch (GenericInterrupter error) {
-            //if (!(error instanceof FatalInterrupter)) token.getSequence().clearRemainder();
-            token.getSequence().setPointer(0);
-            throw new Interruption(error, token);
-        } catch (ParserError error) {
-            throw this.onParseError(token, error);
-        }
-
-        return token;
-    }
-
-    /**
-     * Handles parse errors by throwing a new BaseParseError.
-     *
-     * @param token the token that caused the error
-     * @param error the original error
-     * @return a new BaseParseError
-     */
-    protected BaseParseError onParseError(T token, ParserError error) {
-        return error;
+    protected T instantiateToken(ICompositeToken<?> parent, Sequence sequence) {
+        return CompositeToken.instantiate(this.tokenType, parent, sequence, this.params);
     }
 
     /**

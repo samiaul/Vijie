@@ -5,7 +5,7 @@ import com.vijie.core.errors.GenericInterrupter;
 
 import javax.lang.model.type.NullType;
 
-public interface IGenericFailedToken extends INodeToken<NullType> {
+public interface IDummyToken extends ICompositeToken<NullType> {
     GenericInterrupter getInterrupter();
     GenericFailedTokenError getError();
 }

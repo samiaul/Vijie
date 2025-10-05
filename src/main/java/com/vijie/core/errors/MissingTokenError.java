@@ -1,6 +1,6 @@
 package com.vijie.core.errors;
 
-import com.vijie.core.safe.MissingToken;
+import com.vijie.core.dummy.MissingToken;
 import com.vijie.core.Sequence;
 
 

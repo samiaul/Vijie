@@ -3,6 +3,7 @@ package com.vijie.core.interfaces;
 import com.vijie.core.Sequence;
 import com.vijie.core.errors.BaseParseError;
 import com.vijie.core.errors.GenericFailedTokenError;
+import com.vijie.core.errors.NotFoundError;
 
 import java.util.List;
 

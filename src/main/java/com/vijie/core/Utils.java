@@ -183,4 +183,38 @@ public class Utils {
         }
     }
 
+    /**
+     * A predicate implementation that exclude tokens based on their type.
+     *
+     * @param <T> the type of token to exclude
+     */
+    public static class excludeTokens<T extends IToken<?>> implements Predicate<IToken<?>> {
+
+        /**
+         * The target class type of the token to exclude.
+         */
+        private final Class<? extends T>[] targets;
+
+        /**
+         * Constructs a new excludeTokens predicate.
+         *
+         * @param blacklist the class types of the token to exclude
+         */
+        @SafeVarargs
+        public excludeTokens(Class<? extends T>... blacklist) {
+            this.targets = blacklist;
+        }
+
+        /**
+         * Tests whether the given token matches the target class type.
+         *
+         * @param token the token to test
+         * @return true if the token doesn't match the target class type, false otherwise
+         */
+        @Override
+        public boolean test(IToken<?> token) {
+            return !token.matches(this.targets);
+        }
+    }
+
 }
